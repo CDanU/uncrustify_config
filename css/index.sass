@@ -1,0 +1,124 @@
+@import "./normalize/_normalize.scss"
+
+/** Daniel Chumak | uncrustify_config v0.1.0 | GPLv2+ License 
+    github.com/CDanU/uncrustify_config */
+
+//------------------------------------------------------------------------------
+
+$menuWidth: 300px
+$tabColor: #aaa
+$navHeight: 30px
+$headerHeight: 20px
+$footerHeight: 20px
+
+//------------------------------------------------------------------------------
+
+body
+  display: flex
+  min-height: 100vh
+  flex-direction: column
+
+header
+  width: 100%
+  height: $headerHeight
+
+footer
+  width: 100%
+  height: $footerHeight
+
+nav
+  display: flex
+  width: 100%
+  height: $navHeight
+
+  div
+    flex: 1 1 auto
+    background-color: $tabColor
+    border: 1px solid $tabColor * 0.4
+    text-align: center
+
+#mainBox
+  flex: 0 0 calc( 99.5vh - #{$navHeight + $headerHeight + $footerHeight})
+  overflow: hidden
+
+  display: flex
+  flex-flow: row nowrap
+  border: 2px solid #b00
+  border-left: 0
+  border-right: 0
+
+.tabContainer
+  font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace
+  display: none
+  flex: 1
+  flex-flow: column nowrap
+
+  textarea
+    font-family: inherit
+    flex: 1
+
+#tab0
+  display: flex
+
+
+#tab1
+  flex-flow: row nowrap
+
+  textarea
+    flex: 0 0 auto
+
+.captionBox
+  display: flex
+
+.captionOptionBox
+  display: flex
+  flex-grow: 1
+  align-items: center
+  justify-content: flex-end
+
+  label
+    margin: 0 5px 0 25px
+
+.flex-column
+  display: flex
+  flex: 1
+  flex-flow: column nowrap
+
+#prettydiff
+  flex: 1
+
+#configMenuBox
+  flex: 0 0 auto
+  padding: 5px
+  color: #FFF
+  background-color: #001b22
+  overflow-y: scroll
+
+  ul
+    padding: 0
+    //opacity: 0
+    //max-height: 0
+    //overflow: hidden
+    //transition: opacity 1s ease-out, max-height 1s ease-out
+
+  li
+    height: 30px
+    list-style: none
+
+    *:nth-child(2)
+      float: right
+      margin-left: 5px
+    input
+      width: 150px
+    input[type=checkbox]
+      width: auto
+    select
+      width: 156px
+
+#configDescriptionBox
+  border : 0 solid #B00
+  border-top : 1px #B00
+  border-bottom-width : 2px
+
+#exampleEditorBox
+  flex: 1

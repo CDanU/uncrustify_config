@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UncrustifyConfig</title>
+
+    <link media="all" rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" charset="utf-8" src="./js/ace/ace.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/libUncrustify.js"></script>
+</head>
+
+<body>
+    <header>…</header>
+
+    <nav>
+        <div>read config file</div>
+        <div>edit config</div>
+        <div>config output</div>
+        <div>file input</div>
+        <div>file output</div>
+    </nav>
+
+    <div id="mainBox">
+
+        <div id="tab0" class="tabContainer">
+            <h3>Config Input:</h3>
+            <textarea id="configInput"></textarea>
+            <input type="button" value="GO!" id="configInputButton">
+        </div>
+
+        <div id="tab1" class="tabContainer">
+            <div id="configMenuBox" class="flex-column"></div>
+            <div class="flex-column">
+                <textarea rows="3" id="configDescriptionBox" readonly></textarea>
+                <div id="exampleEditorBox" class="ace-solarized-dark"></div>
+                <!--
+                <div id="prettydiff" class="white">
+                    <div id="webtool"></div>
+                </div>
+                -->
+            </div>
+        </div>
+
+        <div id="tab2" class="tabContainer">
+            <div class="captionBox">
+                <h3>Config Output:</h3>
+
+                <div class="captionOptionBox">
+                    <label>withDoc</label><input type="checkbox" id="configOutputWithDoc">
+                    <label>only_not_default</label><input type="checkbox" id="configOutputOnlyNDefault" checked>
+                </div>
+            </div>
+
+            <textarea id="configOutput"></textarea>
+            <input type="button" value="GO!" >
+        </div>
+
+        <div id="tab3" class="tabContainer">
+            <h3>File Input:</h3>
+            <textarea id="fileInput"></textarea>
+            <input type="button" value="GO!" >
+        </div>
+
+        <div id="tab4" class="tabContainer">
+            <div class="captionBox">
+                <h3>File Output:</h3>
+
+                <div class="captionOptionBox">
+                    <label>isFragment</label><input type="checkbox" id="fileOutputIsFragment">
+                </div>
+            </div>
+            <textarea id="fileOutput"></textarea>
+        </div>
+
+    </div>
+
+    <footer>…</footer>
+
+
+
+
+    <script src="js/main.js"></script>
+    <!--<script src="js/dom.js"></script>-->
+</body>
+
+</html>
