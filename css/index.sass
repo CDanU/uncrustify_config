@@ -10,6 +10,8 @@ $tabColor: #aaa
 $navHeight: 30px
 $headerHeight: 20px
 $footerHeight: 20px
+$menuColor: #04252e
+$menuColor2: darken( $menuColor, 2% )
 
 //------------------------------------------------------------------------------
 
@@ -26,7 +28,7 @@ footer
   width: 100%
   height: $footerHeight
 
-nav
+nav.top
   display: flex
   width: 100%
   height: $navHeight
@@ -91,29 +93,30 @@ nav
   flex: 0 0 auto
   padding: 5px
   color: #FFF
-  background-color: #001b22
+  background-color: $menuColor
   overflow-y: scroll
 
+  input
+    width: 150px
+  input[type=checkbox]
+    width: auto
+  select
+    width: 156px
   ul
     padding: 0
-    //opacity: 0
-    //max-height: 0
-    //overflow: hidden
-    //transition: opacity 1s ease-out, max-height 1s ease-out
-
+    > li
+      > input, > select
+        float: right
+        margin-left: 5px
   li
-    height: 30px
+    min-height: 30px
     list-style: none
+    ul
+      padding : 15px 0 15px 25px
+      margin-bottom: 5px
 
-    *:nth-child(2)
-      float: right
-      margin-left: 5px
-    input
-      width: 150px
-    input[type=checkbox]
-      width: auto
-    select
-      width: 156px
+.dependenciesList
+  background-color: $menuColor2
 
 #configDescriptionBox
   border : 0 solid #B00

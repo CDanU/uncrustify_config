@@ -4,32 +4,26 @@
 
 /// <reference path="../typings/ace.d.ts" />
 /// <reference path="../typings/knockout.d.ts" />
-/// <reference path="../typings/require.d.ts" />
+/// <reference path="../typings/libUncrustify.d.ts" />
+/// <reference path="../typings/map.d.ts" />
 
 
 type HTMLElementValue    = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 type OptionPrimitiveType = string | boolean | number;
 
 
-type OptionElem = HTMLInputElement | HTMLSelectElement;
-type OptionElemList = NodeListOf<OptionElem>;
-type ObjectOrNone = Object | undefined;
-
-
 module uncrustify_config
 {
-    const editor : AceAjax.Editor = ace.edit("exampleEditorBox");
+    const Uncrustify: LibUncrustify.Uncrustify = libUncrustify();
+    Uncrustify.set_quiet();
+
+    const editor        = ace.edit( "exampleEditorBox" );
+    editor.$blockScrolling = Infinity;
     const editorSession = editor.getSession();
     editor.setShowInvisibles( true );
     editor.setShowPrintMargin( true );
-    editor.setTheme("./ace/theme/solarized_dark");
     editorSession.setTabSize( 8 );
     editor.setFontSize( "12pt" );
-
-    let initialized:boolean        = false;
-    let menuBuild:boolean          = false;
-    let configInputChanged:boolean = true; // first time always process input
-    let fileInputChanged:boolean   = true; // first time always process input
 
     namespace SelectorCache
     {
@@ -42,7 +36,6 @@ module uncrustify_config
         ];
         export const Tabs = < NodeListOf < HTMLElement > > document.querySelectorAll( "nav div" );
         export const ConfigInput          = < HTMLTextAreaElement > document.getElementById( "configInput" );
-        export const ConfigInputButton    = <HTMLButtonElement> document.getElementById( "configInputButton" );
         export const ConfigDescriptionBox = < HTMLTextAreaElement > document.getElementById( "configDescriptionBox" );
         export const ConfigOutput = < HTMLTextAreaElement > document.getElementById( "configOutput" );
         export const ConfigOutputWithDoc      = < HTMLInputElement > document.getElementById( "configOutputWithDoc" );
@@ -65,8 +58,8 @@ module uncrustify_config
     const dependencyMap = new Map< string, string[] >([
         ["output_tab_size", ["align_with_tabs"]],
         ["indent_namespace_single_indent", ["indent_namespace"]],
-        ["indent_namespace_level", ["indent_namespace","indent_namespace_single_indent"]],
-        ["indent_namespace_limit", ["indent_namespace","indent_namespace_single_indent","indent_namespace_level"]],
+        ["indent_namespace_level", ["indent_namespace", "indent_namespace_single_indent"]],
+        ["indent_namespace_limit", ["indent_namespace_level"]],
     ]);
 
     enum ExampleStringEnum
@@ -78,21 +71,22 @@ module uncrustify_config
         indentBraces,
         example4,
         multiNamespace,
+        arith,
     }
 
     const exampleStringEnum_string_Map = new Map<ExampleStringEnum, string>( [
-[ ExampleStringEnum.noExample, `no example available` ],
-[ ExampleStringEnum.noExampleYet, `no example available yet` ],
+        [ ExampleStringEnum.noExample, `no example available` ],
+        [ ExampleStringEnum.noExampleYet, `no example available yet` ],
 //------------------------------------------------------------------------------
-[ ExampleStringEnum.example1, `string t2 =\t"Test\tString\t1";` ],
+        [ ExampleStringEnum.example1, `string t2 =\t"Test\tString\t1";` ],
 //------------------------------------------------------------------------------
-[ ExampleStringEnum.example2,
+        [ ExampleStringEnum.example2,
 `void f(list<list<B>>=val);
 else{
 //double tickNumber = (leftRange/(double)lineLength)*i;
 leftTextItem = scene->addText(QString::number( 1000 ));}` ],
 //------------------------------------------------------------------------------
-[ ExampleStringEnum.indentBraces,
+        [ ExampleStringEnum.indentBraces,
 `namespace n{
 int f( int a )
 {
@@ -107,21 +101,38 @@ int f( int a )
     }
     return 1;
 } }` ],
-[ ExampleStringEnum.multiNamespace,
-`namespace ns0
-{
-        namespace ns1
-        {
-            //comment1
-            if(true)
-            {
-                return lFunc(a);
-            }
-        }
+        [ ExampleStringEnum.multiNamespace,
+`namespace ns0{
+void func0();
+namespace ns1{
+void func1();
+void func2();
+void func3();
+void func4();
+void func5();
+void func6();
+}
+namespace ns2{
+void func7();
+namespace ns3{
+void func8();
+}
+}
 }` ],
+        [ ExampleStringEnum.arith,
+`const auto A0 = 1 + 2;
+const auto A1 = 1 - 2;
+const auto A2 = 1 / 2;
+const auto A3 = 1 * 2;
+const auto A4 = 1 >> > 2;
+const auto A5 = 1 << 2;
+const auto A6 = 1 >> 2;
+const auto A7 = 1 % 2;
+const auto A8 = 1 | 2;` ],
+
     ] );
 
-    const optionNameString_Map = new Map<string, string>( [``
+    const optionNameString_Map = new Map<string, string>( [
         ["disable_processing_cmt", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["enable_processing_cmt", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["indent_brace_parent", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
@@ -139,18 +150,181 @@ int f( int a )
         ["input_tab_size", exampleStringEnum_string_Map.get( ExampleStringEnum.example1) ],
         ["newlines", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
         ["output_tab_size", exampleStringEnum_string_Map.get( ExampleStringEnum.example1) ],
-        ["sp_arith", exampleStringEnum_string_Map.get( ExampleStringEnum.noExampleYet) ],
+        ["sp_arith", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
         ["tok_split_gte", exampleStringEnum_string_Map.get( ExampleStringEnum.example2) ],
         ["utf8_bom", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["utf8_byte", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["utf8_force", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
     ] );
+
     //==========================================================================
+
+    let modelBuild: boolean  = false;
+    // initialy set to true to catch the case where a page reload does not clear the text
+    // but no change event is fired
+    let configInputChanged: boolean = true;
+    let fileInputChanged: boolean   = true; // first time always process input
+
+    class Options
+    {
+        public name: string;
+        public type: EmscriptenEnumTypeObject;
+        public value: KnockoutObservable<OptionPrimitiveType>;
+        // initially stored as strings, later converted to Options
+        public dependencies;
+        public example: string;
+        public description: string;
+        public descriptionCallback: Function;
+        public changeCallback: Function;
+
+        constructor( name: string, type: EmscriptenEnumTypeObject, value: OptionPrimitiveType,
+                     description: string, dependencies: string[], example: string )
+        {
+            this.name         = name;
+            this.type         = type;
+            this.value        = ko.observable( value );
+            this.description  = description;
+            this.dependencies = dependencies;
+            this.example      = example;
+            // -----------------------------------------------------------------
+            this.descriptionCallback = function()
+            {
+                setDescription( this.description );
+                return true;
+            };
+            this.changeCallback = optionChange;
+        }
+    }
+
+    class OptionsGroup
+    {
+        public name: string;
+        public options: Options[];
+
+        constructor( name: string )
+        {
+            this.name    = name;
+            this.options = [];
+        }
+
+        addOption( option: Options )
+        {
+            this.options.push( option );
+        };
+    }
+
+    class GroupOptionsViewModel
+    {
+        public groups: KnockoutObservableArray<OptionsGroup>;
+        public lookupMap = new Map<string, Options>();
+
+
+        //private fillLookupMap( group: OptionsGroup )
+        //{
+        //    for( let option of group.options )
+        //    {
+        //        this.lookupMap.set( option.name, option );
+        //    }
+        //}
+
+        // should be in Options as static data, moved for ease of use with template here
+        public AT_IARF = ['ignore', 'add', 'remove', 'force', ];
+        public AT_POS  = ['ignore', 'join', 'lead', 'lead_break', 'lead_force', 'trail', 'trail_break', 'trail_force', ];
+        public AT_LINE = ['auto', 'lf', 'crlf', 'cr', ];
+        // ---------------------------------------------------------------------
+
+        private resolver( option: Options, unresolved: string[], resolved: string[] )
+        {
+            unresolved.push( option.name );
+
+            for( let dependency of option.dependencies )
+            {
+                // skip if already resolved or
+                // usually circular dependencies should throw an error, but here
+                // their sub dependencies are just ignored (to break the circle)
+                // in order to enable referencing from a->b and b->a
+                // example: .a -> ..b -> ...c, ...a, ...d ==> b, c, d
+                //          .b -> ..c, ..a, ..d           ==> a, c, d
+                if( resolved.indexOf( dependency ) !== -1 ||
+                    unresolved.indexOf( dependency ) !== -1 )
+                {
+                    continue;
+                }
+
+                let deppendencyOption = this.lookupMap.get( dependency );
+                if( deppendencyOption == null )
+                {
+                    console.error( "dependency: " + dependency + " is missing in the lookupMap" );
+                    continue;
+                }
+
+                this.resolver( deppendencyOption, unresolved, resolved );
+            }
+
+            resolved.push( option.name );
+
+            const index0 = unresolved.indexOf( option.name );
+            if( index0 > -1 ) { unresolved.splice( index0, 1 ); }
+
+            if( unresolved.length === 0 )
+            {
+                // remove initial option
+                const index1 = resolved.indexOf( option.name );
+                if( index1 > -1 )
+                { resolved.splice( index1, 1 ); }
+
+                return resolved;
+            }
+        };
+
+        public resolveDependencies(): void
+        {
+            // resolves dependencies in order to guarantee all sub dependencies are included
+            for( let group of this.groups() )
+            {
+                for( let option of group.options )
+                {
+                    option.dependencies = this.resolver( option, [], [] );
+                }
+            }
+
+            // converts dependency strings[] into dependency Options[]
+            // needs to be separated into two loops, so that the resolver only
+            // works on strings and not a mix of string and Option
+            for( let group of this.groups() )
+            {
+                for( let option of group.options )
+                {
+                    let optionDependencies: Options[] = [];
+                    for( let dependency of option.dependencies )
+                    {
+                        let dependencyOption: Options = this.lookupMap.get( dependency );
+                        if( dependencyOption == null )
+                        {
+                            console.error( "dependency: " + dependency + " is missing in the lookupMap" );
+                            continue;
+                        }
+                        optionDependencies.push( dependencyOption );
+                    }
+
+                    option.dependencies = optionDependencies;
+                }
+            }
+        }
+
+        constructor()
+        {
+            this.groups = ko.observableArray( [] );
+        }
+    }
+
+    const ViewModel = new GroupOptionsViewModel();
+    const Uncrustify: Uncrustify = libUncrustify();
 
     function openTab( nr: number ): boolean
     {
-        //TODO: set active class
-        if( nr < 0 || nr >= SelectorCache.TabContainers.length )
+        // TODO: set active class
+        if( isNaN(nr) || nr < 0 || nr >= SelectorCache.TabContainers.length )
         {
             return false;
         }
@@ -160,6 +334,7 @@ int f( int a )
         {
             elem.style.display = "none";
         }
+
         SelectorCache.TabContainers[nr].style.display = "flex";
         // --
 
@@ -175,13 +350,13 @@ int f( int a )
                     loadSettings();
                 }
 
-                if( !menuBuild )
+                if( !modelBuild )
                 {
-                    buildMenu();
+                    buildModel();
                 }
                 else if( configInputChanged )
                 {
-                    updateMenu();
+                    updateModel();
                     configInputChanged = false;
                 }
 
@@ -191,11 +366,12 @@ int f( int a )
             case TabStates.outputConfigFile:
             {
                 // loads config via the menu settings
-                loadSettingsFromMenu();
+                loadSettingsFromModel();
                 printSettings();
 
                 break;
             }
+
             case TabStates.fileOutput:
             {
                 if( fileInputChanged )
@@ -205,6 +381,7 @@ int f( int a )
                 }
                 break;
             }
+
             default:
             {
                 break;
@@ -214,28 +391,43 @@ int f( int a )
         return true;
     }
 
-    function loadSettings():void
+    function loadSettings(): void
     {
-        console.log( "loadSettings()" );
         Uncrustify.loadConfig( SelectorCache.ConfigInput.value );
     }
 
-    function loadSettingsFromMenu():void
+    function loadSettingsFromModel(): void
     {
-        const targets:OptionElemList = <OptionElemList> SelectorCache.configMenuBox.querySelectorAll( "input,select" );
-        const targetsLen:number      = targets.length;
+        ViewModel.lookupMap.forEach( function( option ){
+            switch( option.type )
+            {
+                case Uncrustify.argtype_e.AT_IARF:
+                case Uncrustify.argtype_e.AT_POS:
+                case Uncrustify.argtype_e.AT_LINE:
+                case Uncrustify.argtype_e.AT_STRING:
+                {
+                    Uncrustify.set_option( option.name, < string > option.value() );
+                    break;
+                }
 
-        for( let i:number = 0; i < targetsLen; i++ )
-        {
-            if( targets[ i ].type === "checkbox" )
-            {
-                Uncrustify.set_option( targets[ i ].name, targets[ i ].checked === true ? "true" : "false" );
+                case Uncrustify.argtype_e.AT_BOOL:
+                {
+                    Uncrustify.set_option( option.name, option.value() === true ? "true" : "false" );
+                    break;
+                }
+
+                case Uncrustify.argtype_e.AT_NUM:
+                {
+                    Uncrustify.set_option( option.name, option.value().toString() );
+                    break;
+                }
+
+                default:
+                {
+                    return;
+                }
             }
-            else
-            {
-                Uncrustify.set_option( targets[ i ].name, targets[ i ].value );
-            }
-        }
+        } );
     }
 
     function printSettings(): void
@@ -247,212 +439,158 @@ int f( int a )
 
     function initUncrustify(): void
     {
-        if( !initialized )
-        {
-            Uncrustify.initialize();
-            initialized = true;
-        }
+        if( initialized ) { return; }
+
+        Uncrustify.initialize();
+        initialized = true;
     }
 
-    function optionChange( e:Event ):void
+    // returns true to sim html element default event handling
+    function optionChange( option: Options ): boolean
     {
-        // get example string
-        const example:string = optionNameString_Map.get( e.target.name );
-        if( example == null )
-        {
-            console.error("did not found option: "+e.target.name);
-            return;
-        }
-        const optionValue:string = ( e.target.type === "checkbox" ) ? ( e.target.checked ? "true" : "false" ) : e.target.value;
-
         // reset all uncrustify options to default values
         Uncrustify.set_option_defaults();
 
         // set changed option
-        Uncrustify.set_option( e.target.name, optionValue );
+        Uncrustify.set_option( option.name, option.value().toString() );
 
         // set the dependencies of the option
-        const dependencies = dependencyMap.get( e.target.name );
-        if( dependencies != null )
+        for( let dependency of option.dependencies )
         {
-            for( let dependency of dependencies )
-            {
-                const target = SelectorCache.configMenuBox.querySelector( "input[name="+dependency+"],select[name="+dependency+"]" );
-                if( target == null )
-                {
-                    console.error("did not found option input or select element with option name: "+dependency);
-                    continue;
-                }
-                const targetValue = ( target.type === "checkbox" ) ? ( target.checked ? "true" : "false" ) : target.value;
-
-                Uncrustify.set_option( dependency, targetValue );
-            }
+            Uncrustify.set_option( dependency.name, dependency.value().toString() );
         }
 
-        console.log( Uncrustify.show_config( false, true ) );
+        // output_tab_size seems to be a global dependency
+        const outputTabSizeOption: Options = ViewModel.lookupMap.get( "output_tab_size" );
+        if( outputTabSizeOption != null )
+        {
+            Uncrustify.set_option( "output_tab_size", outputTabSizeOption.value().toString() );
+        }
+        // ----
 
         // write formated text to editor
-        editorSession.setValue( Uncrustify.uncrustify( example ) );
+        editorSession.setValue( Uncrustify.uncrustify( option.example ) );
+
+        return true;
     }
 
-    function buildMenu()
+    function buildModel()
     {
-        if( menuBuild ) { return; }
+        if( modelBuild ) { return; }
 
-        const groupEnumValues:Object[] = Uncrustify.uncrustify_groups;
+        const groupEnumValues = Uncrustify.uncrustify_groups;
         const group_map       = Uncrustify.getGroupMap();
         const option_name_map = Uncrustify.getOptionNameMap();
 
+        // enumVal : string, enum option name
         for( let enumVal in groupEnumValues )
         {
             if( enumVal === "values" ) { continue; }
 
-            const groupMapVal:ObjectOrNone = group_map.get( groupEnumValues[ enumVal ] );
-            if( groupMapVal == null  ) { continue; }
+            // groupEnumValues[ enumVal ] : Object, enum option object
+            const group_map_value = group_map.get( groupEnumValues[enumVal] );
+            if( group_map_value == null ) { continue; }
 
-            let groupDiv:HTMLDivElement    = document.createElement( "div" );
-            let groupH3:HTMLHeadingElement = document.createElement( "h3" );
-            let groupUL:HTMLUListElement   = document.createElement( "ul" );
-
-            groupH3.innerHTML = groupMapVal.id.constructor.name;
-
-            const groupOptions    = groupMapVal.options;
-            const groupOptionsLen = groupOptions.size();
-
-            for( let i = 0; i < groupOptionsLen; i++ )
+            const group_object    = new OptionsGroup( enumVal.substr(3).toLowerCase() );
+            const group_options_enum_values    = group_map_value.options;
+            const group_options_len = group_options_enum_values.size();
+            for( let i = 0; i < group_options_len; i++ )
             {
-                const option = groupOptions.get( i );
-                if( option == null ) { continue; }
-                //console.log( option );
+                const option_enum_value = group_options_enum_values.get( i );
+                if( option_enum_value == null ) { continue; }
 
-                const optionMapVal:ObjectOrNone = option_name_map.get( option );
-                if( optionMapVal == null ) { continue; }
-                //console.log( optionMapVal );
+                const option_map_value = option_name_map.get( option_enum_value );
+                if( option_map_value == null ) { continue; }
 
-                let optionLi:HTMLLIElement = document.createElement( "li" );
-
-                let optionLabel:HTMLLabelElement = document.createElement( "label" );
-                optionLabel.innerHTML            = optionMapVal.name;
-
-                let optionInput:OptionElem;
-                switch( optionMapVal.type )
+                let option_setting: OptionPrimitiveType;
+                switch( option_map_value.type )
                 {
                     case Uncrustify.argtype_e.AT_IARF:
-                    {
-                        const optionStrings = [ "ignore", "add", "remove", "force" ];
-                        optionInput         = document.createElement( "select" );
-
-                        //Create and append the options
-                        for( let optionString of optionStrings )
-                        {
-                            let option   = document.createElement( "option" );
-                            option.value = optionString;
-                            option.text  = optionString;
-                            optionInput.appendChild( option );
-                        }
-                        break;
-                    }
-                    case Uncrustify.argtype_e.AT_BOOL:
-                    {
-                        optionInput       = document.createElement( "input" );
-                        optionInput.type  = "checkbox";
-                        optionInput.value = "false";
-                        break;
-                    }
-                    case Uncrustify.argtype_e.AT_NUM:
-                    {
-                        optionInput       = document.createElement( "input" );
-                        optionInput.type  = "number";
-                        optionInput.value = "0";
-                        break;
-                    }
                     case Uncrustify.argtype_e.AT_POS:
-                    {
-                        const optionStrings = [ "ignore", "join", "lead", "lead_break", "lead_force", "trail", "trail_break", "trail_force" ];
-                        optionInput         = document.createElement( "select" );
-
-                        //Create and append the options
-                        for( let optionString of optionStrings )
-                        {
-                            let option   = document.createElement( "option" );
-                            option.value = optionString;
-                            option.text  = optionString;
-                            optionInput.appendChild( option );
-                        }
-                        break;
-                    }
+                    case Uncrustify.argtype_e.AT_LINE:
                     case Uncrustify.argtype_e.AT_STRING:
                     {
-                        optionInput      = document.createElement( "input" );
-                        optionInput.type = "text";
+                        option_setting = Uncrustify.get_option( option_map_value.name );
                         break;
                     }
-                    case Uncrustify.argtype_e.AT_LINE:
-                    {
-                        const optionStrings = [ "auto", "lf", "crlf", "cr" ];
-                        optionInput         = document.createElement( "select" );
 
-                        //Create and append the options
-                        for( let optionString of optionStrings )
-                        {
-                            let option   = document.createElement( "option" );
-                            option.value = optionString;
-                            option.text  = optionString;
-                            optionInput.appendChild( option );
-                        }
+                    case Uncrustify.argtype_e.AT_BOOL:
+                    {
+                        option_setting = Uncrustify.get_option( option_map_value.name ) === 'true';
                         break;
                     }
+
+                    case Uncrustify.argtype_e.AT_NUM:
+                    {
+                        option_setting = parseInt( Uncrustify.get_option( option_map_value.name ) );
+                        break;
+                    }
+
                     default:
                     {
                         continue;
                     }
                 }
-                optionInput.name = optionMapVal.name;
 
-                if( optionInput.type === "checkbox" )
-                {
-                    optionInput.checked = Uncrustify.get_option( optionMapVal.name ) === "true";
-                }
-                else
-                {
-                    optionInput.value = Uncrustify.get_option( optionMapVal.name );
-                }
-                optionInput.onchange = optionChange;
-                optionLi.onclick     = function()
-                {
-                    setDescription( optionMapVal.name + ": " + optionMapVal.short_desc + "\n" + optionMapVal.long_desc );
-                };
+                let dependencies: string[] = dependencyMap.get( option_map_value.name );
+                if( dependencies == null ) { dependencies = []; }
 
-                optionLi.appendChild( optionLabel );
-                optionLi.appendChild( optionInput );
-                groupUL.appendChild( optionLi );
+                let example: string = optionNameString_Map.get( option_map_value.name );
+                if( example == null ) { example = exampleStringEnum_string_Map.get( ExampleStringEnum.noExampleYet); }
+
+                const option_object:Options = new Options( option_map_value.name,
+                                                           option_map_value.type,
+                                                           option_setting,
+                                                           option_map_value.name + ": " + option_map_value.short_desc + "\n" + option_map_value.long_desc,
+                                                           dependencies, example );
+
+                group_object.addOption( option_object );
             }
 
-            groupDiv.appendChild( groupH3 );
-            groupDiv.appendChild( groupUL );
-
-            SelectorCache.configMenuBox.appendChild( groupDiv );
+            ViewModel.addGroup( group_object );
         }
+        ViewModel.resolveDependencies();
 
-        menuBuild = true;
+        ko.applyBindings( ViewModel );
+        modelBuild = true;
     }
 
-    function updateMenu()
+    function updateModel()
     {
-        const targets:OptionElemList = <OptionElemList> SelectorCache.configMenuBox.querySelectorAll( "input,select" );
-        const targetsLen:number = targets.length;
+        ViewModel.lookupMap.forEach( function( option ){
+            let optVal: OptionPrimitiveType;
 
-        for( let i:number = 0; i < targetsLen; i++ )
-        {
-            if( targets[ i ].type === "checkbox" )
+            switch( option.type )
             {
-                targets[ i ].checked = Uncrustify.get_option( targets[ i ].name ) === "true";
+                case Uncrustify.argtype_e.AT_IARF:
+                case Uncrustify.argtype_e.AT_POS:
+                case Uncrustify.argtype_e.AT_LINE:
+                case Uncrustify.argtype_e.AT_STRING:
+                {
+                    optVal = Uncrustify.get_option( option.name );
+                    break;
+                }
+
+                case Uncrustify.argtype_e.AT_BOOL:
+                {
+                    optVal = Uncrustify.get_option( option.name ) === 'true';
+                    break;
+                }
+
+                case Uncrustify.argtype_e.AT_NUM:
+                {
+                    optVal = parseInt( Uncrustify.get_option( option.name ) );
+                    break;
+                }
+
+                default:
+                {
+                    return;
+                }
             }
-            else
-            {
-                targets[ i ].value = Uncrustify.get_option( targets[ i ].name );
-            }
-        }
+
+            option.value( optVal );
+        } );
     }
 
     function setDescription( text: string )
@@ -463,7 +601,6 @@ int f( int a )
     function formatFile()
     {
         const isFrag:boolean = SelectorCache.FileOutputIsFragment.checked;
-        console.log( Uncrustify.show_config( false, true ) );
         SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, isFrag );
     }
 
@@ -484,11 +621,9 @@ int f( int a )
 
         SelectorCache.FileInput.onchange = function()
         {
-            console.log( "FileInput.onchange()" );
             fileInputChanged = true;
         };
     }
 
     assignEvents();
-    openTab(1);
 }

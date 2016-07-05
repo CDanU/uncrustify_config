@@ -5,6 +5,8 @@
     <title>UncrustifyConfig</title>
 
     <link media="all" rel="stylesheet" type="text/css" href="css/index.css" />
+
+    <script type="text/javascript" charset="utf-8" src="./js/knockout-3.4.0.js"></script>
     <script type="text/javascript" charset="utf-8" src="./js/ace/ace.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/libUncrustify.js"></script>
 </head>
@@ -12,7 +14,7 @@
 <body>
     <header>…</header>
 
-    <nav>
+    <nav class="top">
         <div>read config file</div>
         <div>edit config</div>
         <div>config output</div>
@@ -20,28 +22,123 @@
         <div>file output</div>
     </nav>
 
-    <div id="mainBox">
+    <main id="mainBox">
 
-        <div id="tab0" class="tabContainer">
+        <section id="tab0" class="tabContainer">
             <h3>Config Input:</h3>
             <textarea id="configInput"></textarea>
-            <input type="button" value="GO!" id="configInputButton">
-        </div>
+        </section>
 
-        <div id="tab1" class="tabContainer">
-            <div id="configMenuBox" class="flex-column"></div>
+        <section id="tab1" class="tabContainer">
+            <div id="configMenuBox" class="flex-column" data-bind="foreach: groups">
+                <div class="groupContainer">
+                    <h3 data-bind="text: name"></h3>
+                    <ul data-bind="foreach: options">
+                        <li data-bind="event: { click: descriptionCallback}">
+                            <label data-bind="text: name"></label>
+
+                            <!-- ko if: type.constructor.name === "argtype_e_AT_IARF" -->
+                            <select data-bind="attr: { name: name },
+                                               options: $root.AT_IARF,
+                                               value: value,
+                                               event: { change: changeCallback}"></select>
+                            <!-- /ko -->
+
+                            <!-- ko if: type.constructor.name === "argtype_e_AT_BOOL" -->
+                            <input type="checkbox" data-bind="attr: { name: name },
+                                                              checked: value,
+                                                              event: { change: changeCallback}">
+                            <!-- /ko -->
+
+                            <!-- ko if: type.constructor.name === "argtype_e_AT_NUM" -->
+                            <input type="number" data-bind="attr: { name: name },
+                                                            value: value,
+                                                            event: { change: changeCallback}">
+                            <!-- /ko -->
+
+                            <!-- ko if: type.constructor.name === "argtype_e_AT_POS" -->
+                            <select data-bind="attr: { name: name },
+                                               options: $root.AT_POS,
+                                               value: value,
+                                               event: { change: changeCallback}"></select>
+                            <!-- /ko -->
+
+                            <!-- ko if: type.constructor.name === "argtype_e_AT_STRING" -->
+                            <input type="text" data-bind="attr: { name: name },
+                                                          value: value,
+                                                          event: { change: changeCallback}">
+                            <!-- /ko -->
+
+                            <!-- ko if: type.constructor.name === "argtype_e_AT_LINE" -->
+                            <select data-bind="attr: { name: name },
+                                               options: $root.AT_LINE,
+                                               value: value,
+                                               event: { change: changeCallback}"></select>
+                            <!-- /ko -->
+
+                            <!-- ko if: dependencies.length > 0 -->
+                            <ul data-bind="foreach: dependencies" class="dependenciesList">
+                                <li>
+                                    <label data-bind="text: name"></label>
+
+                                    <!-- ko if: type.constructor.name === "argtype_e_AT_IARF" -->
+                                    <select data-bind="attr: { name: name },
+                                                       options: $root.AT_IARF,
+                                                       value: value,
+                                                       event: { change: function(data){ changeCallback($parent) } }
+                                                       "></select>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: type.constructor.name === "argtype_e_AT_BOOL" -->
+                                    <input type="checkbox" data-bind="attr: { name: name },
+                                                                      checked: value,
+                                                                      event: { change: function(data){ changeCallback($parent) } }
+                                                                      ">
+                                    <!-- /ko -->
+
+                                    <!-- ko if: type.constructor.name === "argtype_e_AT_NUM" -->
+                                    <input type="number" data-bind="attr: { name: name },
+                                                                    value: value,
+                                                                    event: { change: function(data){ changeCallback($parent) } }
+                                                                    ">
+                                    <!-- /ko -->
+
+                                    <!-- ko if: type.constructor.name === "argtype_e_AT_POS" -->
+                                    <select data-bind="attr: { name: name },
+                                                       options: $root.AT_POS,
+                                                       value: value,
+                                                       event: { change: function(data){ changeCallback($parent) } }
+                                                       "></select>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: type.constructor.name === "argtype_e_AT_STRING" -->
+                                    <input type="text" data-bind="attr: { name: name },
+                                                                  value: value,
+                                                                  event: { change: function(data){ changeCallback($parent) } }
+                                                                  ">
+                                    <!-- /ko -->
+
+                                    <!-- ko if: type.constructor.name === "argtype_e_AT_LINE" -->
+                                    <select data-bind="attr: { name: name },
+                                                       options: $root.AT_LINE,
+                                                       value: value,
+                                                       event: { change: function(data){ changeCallback($parent) } }
+                                                       "></select>
+                                    <!-- /ko -->
+                                </li>
+                            </ul>
+                            <!-- /ko -->
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <div class="flex-column">
                 <textarea rows="3" id="configDescriptionBox" readonly></textarea>
                 <div id="exampleEditorBox" class="ace-solarized-dark"></div>
-                <!--
-                <div id="prettydiff" class="white">
-                    <div id="webtool"></div>
-                </div>
-                -->
             </div>
-        </div>
+        </section>
 
-        <div id="tab2" class="tabContainer">
+        <section id="tab2" class="tabContainer">
             <div class="captionBox">
                 <h3>Config Output:</h3>
 
@@ -52,16 +149,14 @@
             </div>
 
             <textarea id="configOutput"></textarea>
-            <input type="button" value="GO!" >
-        </div>
+        </section>
 
-        <div id="tab3" class="tabContainer">
+        <section id="tab3" class="tabContainer">
             <h3>File Input:</h3>
             <textarea id="fileInput"></textarea>
-            <input type="button" value="GO!" >
-        </div>
+        </section>
 
-        <div id="tab4" class="tabContainer">
+        <section id="tab4" class="tabContainer">
             <div class="captionBox">
                 <h3>File Output:</h3>
 
@@ -70,17 +165,15 @@
                 </div>
             </div>
             <textarea id="fileOutput"></textarea>
-        </div>
+        </section>
 
-    </div>
+    </main>
 
     <footer>…</footer>
 
 
 
-
     <script src="js/main.js"></script>
-    <!--<script src="js/dom.js"></script>-->
 </body>
 
 </html>
