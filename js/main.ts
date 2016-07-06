@@ -31,8 +31,7 @@ module uncrustify_config
             document.getElementById( "tab0" ),
             document.getElementById( "tab1" ),
             document.getElementById( "tab2" ),
-            document.getElementById( "tab3" ),
-            document.getElementById( "tab4" ),
+            document.getElementById( "tab3" )
         ];
         export const Tabs = < NodeListOf < HTMLElement > > document.querySelectorAll( "nav div" );
         export const ConfigInput          = < HTMLTextAreaElement > document.getElementById( "configInput" );
@@ -51,8 +50,7 @@ module uncrustify_config
         readConfigFile   = 0,
         editConfig       = 1,
         outputConfigFile = 2,
-        fileInput        = 3,
-        fileOutput       = 4,
+        fileIO = 3,
     }
 
     const dependencyMap = new Map< string, string[] >([
@@ -163,7 +161,6 @@ const auto A8 = 1 | 2;` ],
     // initialy set to true to catch the case where a page reload does not clear the text
     // but no change event is fired
     let configInputChanged: boolean = true;
-    let fileInputChanged: boolean   = true; // first time always process input
 
     class Options
     {
@@ -372,15 +369,6 @@ const auto A8 = 1 | 2;` ],
                 break;
             }
 
-            case TabStates.fileOutput:
-            {
-                if( fileInputChanged )
-                {
-                    formatFile();
-                    fileInputChanged = false;
-                }
-                break;
-            }
 
             default:
             {
@@ -618,11 +606,7 @@ const auto A8 = 1 | 2;` ],
         };
         SelectorCache.ConfigOutputWithDoc.onchange      = printSettings;
         SelectorCache.ConfigOutputOnlyNDefault.onchange = printSettings;
-
-        SelectorCache.FileInput.onchange = function()
-        {
-            fileInputChanged = true;
-        };
+        SelectorCache.FileInput.onchange = formatFile;
     }
 
     assignEvents();
