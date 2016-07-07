@@ -215,6 +215,21 @@ const auto A8 = 1 | 2;` ],
         public groups: KnockoutObservableArray<OptionsGroup>;
         public lookupMap = new Map<string, Options>();
 
+        public AT_IARF = ['ignore', 'add', 'force', 'remove',];
+        public AT_POS  = ['ignore', 'join', 'lead', 'lead_break', 'lead_force', 'trail', 'trail_break', 'trail_force',];
+        public AT_LINE = ['auto', 'lf', 'crlf', 'cr',];
+        //----------------------------------------------------------------------
+        
+        private fillLookupMapFull()
+        {
+            for( let group of this.groups() )
+            {
+                for( let option of group.options )
+                {
+                    this.lookupMap.set( option.name, option );
+                }
+            }
+        }
 
         //private fillLookupMap( group: OptionsGroup )
         //{
@@ -223,12 +238,6 @@ const auto A8 = 1 | 2;` ],
         //        this.lookupMap.set( option.name, option );
         //    }
         //}
-
-        // should be in Options as static data, moved for ease of use with template here
-        public AT_IARF = ['ignore', 'add', 'remove', 'force', ];
-        public AT_POS  = ['ignore', 'join', 'lead', 'lead_break', 'lead_force', 'trail', 'trail_break', 'trail_force', ];
-        public AT_LINE = ['auto', 'lf', 'crlf', 'cr', ];
-        // ---------------------------------------------------------------------
 
         private resolver( option: Options, unresolved: string[], resolved: string[] )
         {
@@ -312,11 +321,9 @@ const auto A8 = 1 | 2;` ],
         constructor()
         {
             this.groups = ko.observableArray( [] );
+            this.groups.subscribe( () => this.fillLookupMapFull.call(this) );
         }
     }
-
-    const ViewModel = new GroupOptionsViewModel();
-    const Uncrustify: Uncrustify = libUncrustify();
 
     function openTab( nr: number ): boolean
     {
@@ -335,7 +342,6 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.TabContainers[nr].style.display = "flex";
         // --
 
-        initUncrustify();
 
         switch( nr )
         {
@@ -345,14 +351,6 @@ const auto A8 = 1 | 2;` ],
                 if( configInputChanged )
                 {
                     loadSettings();
-                }
-
-                if( !modelBuild )
-                {
-                    buildModel();
-                }
-                else if( configInputChanged )
-                {
                     updateModel();
                     configInputChanged = false;
                 }
@@ -469,6 +467,7 @@ const auto A8 = 1 | 2;` ],
         const groupEnumValues = Uncrustify.uncrustify_groups;
         const group_map       = Uncrustify.getGroupMap();
         const option_name_map = Uncrustify.getOptionNameMap();
+        let   groupsArr: OptionsGroup[] = [];
 
         // enumVal : string, enum option name
         for( let enumVal in groupEnumValues )
@@ -535,11 +534,11 @@ const auto A8 = 1 | 2;` ],
                 group_object.addOption( option_object );
             }
 
-            ViewModel.addGroup( group_object );
+            groupsArr.push( group_object );
         }
+        ViewModel.groups( groupsArr );
         ViewModel.resolveDependencies();
 
-        ko.applyBindings( ViewModel );
         modelBuild = true;
     }
 
@@ -588,7 +587,7 @@ const auto A8 = 1 | 2;` ],
 
     function formatFile()
     {
-        const isFrag:boolean = SelectorCache.FileOutputIsFragment.checked;
+        const isFrag = SelectorCache.FileOutputIsFragment.checked;
         SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, isFrag );
     }
 
@@ -608,6 +607,12 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.ConfigOutputOnlyNDefault.onchange = printSettings;
         SelectorCache.FileInput.onchange = formatFile;
     }
+
+
+    const ViewModel = new GroupOptionsViewModel();
+    initUncrustify();
+    buildModel();
+    ko.applyBindings( ViewModel );
 
     assignEvents();
 }
