@@ -566,6 +566,16 @@ const auto A8 = 1 | 2;` ],
         ViewModel.groups( groupsArr );
         ViewModel.resolveDependencies();
 
+        // special case: adjusts editor tab size
+        const outputTabSizeOption: Options = ViewModel.lookupMap.get( "output_tab_size" );
+        if( outputTabSizeOption != null )
+        {
+            editorSession.setTabSize( <number> outputTabSizeOption.value() );
+
+            outputTabSizeOption.value.subscribe( function( o: number ){
+                editorSession.setTabSize( o );
+            } );
+        }
         modelBuild = true;
     }
 
