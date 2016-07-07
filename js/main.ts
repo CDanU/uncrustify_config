@@ -184,6 +184,8 @@ const auto A8 = 1 | 2;` ],
     // initialy set to true to catch the case where a page reload does not clear the text
     // but no change event is fired
     let configInputChanged: boolean = true;
+    let editorOpened: boolean       = false;
+    let configOutputOpened: boolean = false;
 
     class Options
     {
@@ -367,30 +369,39 @@ const auto A8 = 1 | 2;` ],
         }
 
         SelectorCache.TabContainers[nr].style.display = "flex";
-        // --
 
 
+        if( nr != TabStates.readConfigFile )
+        {
+            if( configInputChanged )
+            {
+                loadSettings( SelectorCache.ConfigInput );
+                configInputChanged = false;
+            }
+        }
         switch( nr )
         {
             case TabStates.editConfig:
             {
-                // loads settings only to set the menu accordingly
-                if( configInputChanged )
-                {
-                    loadSettings();
-                    updateModel();
-                    configInputChanged = false;
-                }
-
+                editorOpened = true;
                 break;
             }
 
             case TabStates.outputConfigFile:
             {
-                // loads config via the menu settings
-                loadSettingsFromModel();
+                if( editorOpened ) { loadSettingsFromModel(); }
                 printSettings();
+                configOutputOpened = true;
+                break;
+            }
 
+            case TabStates.fileIO:
+            {
+                if( configOutputOpened )
+                {
+                    loadSettings( SelectorCache.ConfigOutput );
+                }
+                else if( editorOpened ) { loadSettingsFromModel(); }
                 break;
             }
 
@@ -404,9 +415,10 @@ const auto A8 = 1 | 2;` ],
         return true;
     }
 
-    function loadSettings(): void
+    function loadSettings( target: HTMLElementValue ): void
     {
-        Uncrustify.loadConfig( SelectorCache.ConfigInput.value );
+        Uncrustify.loadConfig( target.value );
+        updateModel();
     }
 
     function loadSettingsFromModel(): void
@@ -650,6 +662,12 @@ const auto A8 = 1 | 2;` ],
         {
             configInputChanged = true; // see configInputChanged desc
         };
+
+        SelectorCache.ConfigOutput.onchange = function()
+        {
+            loadSettings( SelectorCache.ConfigOutput );
+        };
+
         SelectorCache.ConfigOutputWithDoc.onchange      = printSettings;
         SelectorCache.ConfigOutputOnlyNDefault.onchange = printSettings;
         SelectorCache.FileInput.onchange = formatFile;
