@@ -155,6 +155,29 @@ const auto A8 = 1 | 2;` ],
         ["utf8_force", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
     ] );
 
+    const langFlagsStrings = [
+        "C",
+        "C++",
+        "D",
+        "C#",
+        "Vala",
+        "Java",
+        "PAWN",
+        "Objective-C",
+        "JavaScript",
+    ];
+
+    const stringLangFlagsMap = new Map<string, EmscriptenEnumTypeObject>( [
+        [ langFlagsStrings[0], Uncrustify.lang_flag_e.LANG_C ],
+        [ langFlagsStrings[1], Uncrustify.lang_flag_e.LANG_CPP ],
+        [ langFlagsStrings[2], Uncrustify.lang_flag_e.LANG_D ],
+        [ langFlagsStrings[3], Uncrustify.lang_flag_e.LANG_CS ],
+        [ langFlagsStrings[4], Uncrustify.lang_flag_e.LANG_VALA ],
+        [ langFlagsStrings[5], Uncrustify.lang_flag_e.LANG_JAVA ],
+        [ langFlagsStrings[6], Uncrustify.lang_flag_e.LANG_PAWN ],
+        [ langFlagsStrings[7], Uncrustify.lang_flag_e.LANG_OC ],
+        [ langFlagsStrings[8], Uncrustify.lang_flag_e.LANG_ECMA ],
+    ] );
     //==========================================================================
 
     let modelBuild: boolean  = false;
@@ -213,11 +236,13 @@ const auto A8 = 1 | 2;` ],
     class GroupOptionsViewModel
     {
         public groups: KnockoutObservableArray<OptionsGroup>;
+        public isFragment: KnockoutObservable<boolean>;
+        public fileLang: KnockoutObservable<string>;
         public lookupMap = new Map<string, Options>();
-
         public AT_IARF = ['ignore', 'add', 'force', 'remove',];
         public AT_POS  = ['ignore', 'join', 'lead', 'lead_break', 'lead_force', 'trail', 'trail_break', 'trail_force',];
         public AT_LINE = ['auto', 'lf', 'crlf', 'cr',];
+        public langFlagStrings = langFlagsStrings;
         //----------------------------------------------------------------------
         
         private fillLookupMapFull()
@@ -320,8 +345,10 @@ const auto A8 = 1 | 2;` ],
 
         constructor()
         {
-            this.groups = ko.observableArray( [] );
-            this.groups.subscribe( () => this.fillLookupMapFull.call(this) );
+            this.isFragment = ko.observable( false );
+            this.fileLang   = ko.observable( "C++" );
+            this.groups     = ko.observableArray( [] );
+            this.groups.subscribe( () => this.fillLookupMapFull.call( this ) );
         }
     }
 
@@ -587,7 +614,17 @@ const auto A8 = 1 | 2;` ],
 
     function formatFile()
     {
-        const isFrag = SelectorCache.FileOutputIsFragment.checked;
+        const isFrag      = ViewModel.isFragment();
+        const langString  = ViewModel.fileLang();
+        let   langEnumObj = stringLangFlagsMap.get( langString );
+
+        if( langEnumObj == null )
+        {
+            console.error( "No fitting Enum Object found for the language" + langString + " Language set to C++" );
+            langEnumObj = Uncrustify.lang_flag_e.LANG_CPP;
+        }
+
+        Uncrustify.set_language( langEnumObj );
         SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, isFrag );
     }
 
@@ -606,6 +643,9 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.ConfigOutputWithDoc.onchange      = printSettings;
         SelectorCache.ConfigOutputOnlyNDefault.onchange = printSettings;
         SelectorCache.FileInput.onchange = formatFile;
+
+        ViewModel.isFragment.subscribe( formatFile );
+        ViewModel.fileLang.subscribe( formatFile );
     }
 
 
