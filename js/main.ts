@@ -356,16 +356,25 @@ const auto A8 = 1 | 2;` ],
 
     function openTab( nr: number ): boolean
     {
-        // TODO: set active class
         if( isNaN(nr) || nr < 0 || nr >= SelectorCache.TabContainers.length )
         {
             return false;
         }
 
+
+        // manage active state of tabs
+        for( let elem of <any> SelectorCache.Tabs )
+        {
+            elem.classList.remove( "active" );
+        }
+
+        SelectorCache.Tabs[nr].classList.add( "active" );
+
         // manage visibility of tab containers
         for( let elem of SelectorCache.TabContainers )
         {
             elem.style.display = "none";
+            elem.classList.remove( "active" );
         }
 
         SelectorCache.TabContainers[nr].style.display = "flex";
