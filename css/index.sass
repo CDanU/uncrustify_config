@@ -5,39 +5,119 @@
 
 //------------------------------------------------------------------------------
 
+$optionMenuWidth: (str-length("trail_force")+1)+ch
+
 $menuWidth: 300px
-$tabColor: #aaa
 $navHeight: 30px
 $headerHeight: 20px
 $footerHeight: 20px
 $menuColor: #04252e
 $menuColor2: darken( $menuColor, 2% )
+$textarea_Background : $menuColor
+
+$mainBackground: #3d3d3d
+
+$header_Background: darken( $mainBackground, 8)
+
+$tabRadius: 9px 9px 0 0
+
+$tabBackground_BorderColor : #000
+$tabBackground_BackgroundColors : #394039, #313731
+$tabBackground_Background : linear-gradient( nth($tabBackground_BackgroundColors, 1), nth($tabBackground_BackgroundColors, 2))
+
+$tab_BorderColor : #000
+$tab_Background : transparent
+$tabActive_BackgroundColors : #4d564c, #424a41
+$tabActive_Background : linear-gradient( nth($tabActive_BackgroundColors, 1), nth($tabActive_BackgroundColors, 2))
+$tabHover_Color : #0F0
+$tabHover_BorderColor : transparent
+
+$outTab_Background :       mix( nth($tabBackground_BackgroundColors,1), #050 )
+$outTabActive_Background : mix( nth($tabActive_BackgroundColors,1), #050 )
+
+
+
+// mixin -----------------------------------------------------------------------
+=tabBackground()
+  border: 1px solid $tabBackground_BorderColor
+  border-radius: $tabRadius
+  background: $tabBackground_Background
+
+=tab()
+  color: #fff
+  border: 1px solid $tab_BorderColor
+  border-radius: $tabRadius
+  background: $tab_Background
+  &:hover
+    border-color: $tabHover_BorderColor
+    color: $tabHover_Color
+  &.active
+    background: $tabActive_Background
+    border-color: #555
 
 //------------------------------------------------------------------------------
 
 body
+  height: 100%
+  overflow: hidden
   display: flex
-  min-height: 100vh
   flex-direction: column
+  background-color: $mainBackground
+  color: #eee
+
 
 header
   width: 100%
   height: $headerHeight
 
+
 footer
   width: 100%
   height: $footerHeight
 
+
+// lets a given width equally look on both elements
+input,select
+  box-sizing: border-box
+
+
+input
+  padding-left: 3px
+
+
+textarea
+  border: 6px solid #333
+  padding: 10px
+  color: #eee
+  background: $textarea_Background
+  white-space: pre
+  word-wrap: normal
+
+
+h3
+  background: $header_Background
+  margin: 0
+  padding: 10px
+
+
 nav.top
-  display: flex
   width: 100%
   height: $navHeight
+  display: flex
+  font-size: 25px
+  +tabBackground()
 
   div
-    flex: 1 1 auto
-    background-color: $tabColor
-    border: 1px solid $tabColor * 0.4
+    flex: 1
     text-align: center
+    +tab()
+
+    &.out
+      background : $outTab_Background
+    &.out
+      &.active
+        background: $outTabActive_Background
+
 
 #mainBox
   flex: 0 0 calc( 99.5vh - #{$navHeight + $headerHeight + $footerHeight})
@@ -45,9 +125,7 @@ nav.top
 
   display: flex
   flex-flow: row nowrap
-  border: 2px solid #b00
-  border-left: 0
-  border-right: 0
+
 
 .tabContainer
   font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace
@@ -69,8 +147,59 @@ nav.top
   textarea
     flex: 0 0 auto
 
+  
+#exampleEditorBox
+  flex: 1
+
+
+#configMenuBox
+  flex: 0 0 auto
+  //min-width: 600px
+  color: #FFF
+  background-color: $menuColor
+  overflow-y: scroll
+
+  label
+    font-size: 10pt
+    display: inline-block
+    overflow: hidden
+    text-overflow: ellipsis
+    // extra heigh for input && select + text centering
+    padding : .35rem 0
+    // shrinks li parent elem that is too big
+    margin-bottom: -5px
+
+  input
+    width: $optionMenuWidth
+  input[type=checkbox]
+    width: auto
+    margin-top : .35rem
+    margin-bottom : .35rem
+  select
+    width: $optionMenuWidth
+  ul
+    padding : 0 0 0 10px
+    > li
+      > input, > select
+        float: right
+        margin-left: 5px
+        margin-right: 15px
+  li
+    list-style: none
+    border-bottom: 1px dashed lighten( $menuColor, 5% )
+    //overflow: auto // used to take height from child elem inputs
+
+    ul
+      border-top: 1px dashed lighten( $menuColor, 5% )
+      padding: 10px 0 10px 35px
+      margin-bottom: 5px
+      margin-left: -10px
+
+
 .captionBox
+  background: $header_Background
   display: flex
+
 
 .captionOptionBox
   display: flex
@@ -81,47 +210,12 @@ nav.top
   label
     margin: 0 5px 0 25px
 
+
 .flex-column
   display: flex
   flex: 1
   flex-flow: column nowrap
 
-#prettydiff
-  flex: 1
-
-#configMenuBox
-  flex: 0 0 auto
-  padding: 5px
-  color: #FFF
-  background-color: $menuColor
-  overflow-y: scroll
-
-  input
-    width: 150px
-  input[type=checkbox]
-    width: auto
-  select
-    width: 156px
-  ul
-    padding: 0
-    > li
-      > input, > select
-        float: right
-        margin-left: 5px
-  li
-    min-height: 30px
-    list-style: none
-    ul
-      padding : 15px 0 15px 25px
-      margin-bottom: 5px
 
 .dependenciesList
   background-color: $menuColor2
-
-#configDescriptionBox
-  border : 0 solid #B00
-  border-top : 1px #B00
-  border-bottom-width : 2px
-
-#exampleEditorBox
-  flex: 1
