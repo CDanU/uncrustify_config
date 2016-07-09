@@ -683,6 +683,28 @@ const auto A8 = 1 | 2;` ],
 
         ViewModel.isFragment.subscribe( formatFile );
         ViewModel.fileLang.subscribe( formatFile );
+
+        const orientationBtnImg = <HTMLImageElement> document.getElementById( "orientationBtn" );
+        orientationBtnImg.onclick = function(): void {
+            const oBtnClsList = orientationBtnImg.classList;
+            if( oBtnClsList.contains("rotate") )
+            {
+                oBtnClsList.remove("rotate");
+                SelectorCache.TabContainers[TabStates.fileIO].classList.remove("rotate");
+            }
+            else
+            {
+                oBtnClsList.add("rotate");
+                SelectorCache.TabContainers[TabStates.fileIO].classList.add("rotate");
+            }
+            // reset textarea size to always be able to see both after a switch
+            // (chromium behaves sometimes faulty if a textarea was resized)
+            SelectorCache.FileInput.style.width   = "";
+            SelectorCache.FileInput.style.height  = "";
+            SelectorCache.FileOutput.style.width  = "";
+            SelectorCache.FileOutput.style.height = "";
+        };
+
     }
 
 

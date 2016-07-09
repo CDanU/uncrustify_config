@@ -118,6 +118,19 @@ nav.top
       &.active
         background: $outTabActive_Background
 
+#orientationBtn
+  cursor: pointer
+  height: 25px
+  border: 1px solid black
+  padding: 5px
+  background-color: lighten($header_Background, 2%)
+
+  &:hover
+    background-color: lighten($header_Background, 4%)
+
+  &.rotate
+    transform: rotate(90deg)
+
 
 #mainBox
   flex: 0 0 calc( 99.5vh - #{$navHeight + $headerHeight + $footerHeight})
@@ -146,6 +159,12 @@ nav.top
 
   textarea
     flex: 0 0 auto
+
+
+#tab3
+  flex-flow: row nowrap
+  &.rotate
+    flex-flow: column nowrap
 
   
 #exampleEditorBox
@@ -199,13 +218,11 @@ nav.top
 .captionBox
   background: $header_Background
   display: flex
+  align-items: center
 
 
 .captionOptionBox
-  display: flex
-  flex-grow: 1
-  align-items: center
-  justify-content: flex-end
+  margin-left: auto
 
   label
     margin: 0 5px 0 25px
@@ -219,3 +236,7 @@ nav.top
 
 .dependenciesList
   background-color: $menuColor2
+
+
+.inline
+  display: inline-block
