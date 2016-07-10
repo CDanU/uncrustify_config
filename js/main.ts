@@ -294,6 +294,7 @@ const auto A8 = 1 | 2;` ],
         public description: string;
         public descriptionCallback: Function;
         public changeCallback: Function;
+        public resetCallback: Function;
 
         constructor( name: string, type: EmscriptenEnumTypeObject, value: OptionPrimitiveType,
                      description: string, dependencies: string[], example: string )
@@ -311,6 +312,12 @@ const auto A8 = 1 | 2;` ],
                 return true;
             };
             this.changeCallback = optionChange;
+            this.resetCallback = function(obj)
+            {
+                this.descriptionCallback();
+                optionChange(obj);
+                return true;
+            };
         }
     }
 

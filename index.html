@@ -33,86 +33,96 @@
                 <div class="groupContainer">
                     <h3 data-bind="text: name"></h3>
                     <ul data-bind="foreach: options">
-                        <li data-bind="event: { click: descriptionCallback}">
+                        <li data-bind="event: { click: resetCallback }">
                             <label data-bind="text: name"></label>
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_IARF" -->
                             <select data-bind="attr: { name: name },
                                                options: $root.AT_IARF,
                                                value: value,
-                                               event: { change: changeCallback}"></select>
+                                               event: { change: changeCallback,
+                                                        focus: resetCallback }"></select>
                             <!-- /ko -->
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_BOOL" -->
                             <input type="checkbox" data-bind="attr: { name: name },
                                                               checked: value,
-                                                              event: { change: changeCallback}">
+                                                              event: { change: changeCallback,
+                                                                       focus: resetCallback }">
                             <!-- /ko -->
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_NUM" -->
                             <input type="number" data-bind="attr: { name: name },
                                                             value: value,
-                                                            event: { change: changeCallback}">
+                                                            event: { change: changeCallback,
+                                                                     focus: resetCallback }">
                             <!-- /ko -->
-
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_UNUM" -->
                             <input type="number" min="0" data-bind="attr: { name: name },
                                                                     value: value,
-                                                                    event: { change: changeCallback}">
+                                                                    event: { change: changeCallback,
+                                                                             focus: resetCallback }">
                             <!-- /ko -->
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_POS" -->
                             <select data-bind="attr: { name: name },
                                                options: $root.AT_POS,
                                                value: value,
-                                               event: { change: changeCallback}"></select>
+                                               event: { change: changeCallback,
+                                                        focus: resetCallback }"></select>
                             <!-- /ko -->
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_STRING" -->
                             <input type="text" data-bind="attr: { name: name },
                                                           value: value,
-                                                          event: { change: changeCallback}">
+                                                          event: { change: changeCallback,
+                                                                   focus: resetCallback }">
                             <!-- /ko -->
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_LINE" -->
                             <select data-bind="attr: { name: name },
                                                options: $root.AT_LINE,
                                                value: value,
-                                               event: { change: changeCallback}"></select>
+                                               event: { change: changeCallback,
+                                                        focus: resetCallback }"></select>
                             <!-- /ko -->
 
                             <!-- ko if: dependencies.length > 0 -->
                             <ul data-bind="foreach: dependencies" class="dependenciesList">
-                                <li>
+                                <li data-bind="event: { click: function(){ return resetCallback($parent)} }, clickBubble: false">
                                     <label data-bind="text: name"></label>
 
                                     <!-- ko if: type.constructor.name === "argtype_e_AT_IARF" -->
                                     <select data-bind="attr: { name: name },
                                                        options: $root.AT_IARF,
                                                        value: value,
-                                                       event: { change: function(data){ changeCallback($parent) } }
+                                                       event: { change: function(){ changeCallback($parent); },
+                                                                focus: descriptionCallback }
                                                        "></select>
                                     <!-- /ko -->
 
                                     <!-- ko if: type.constructor.name === "argtype_e_AT_BOOL" -->
                                     <input type="checkbox" data-bind="attr: { name: name },
                                                                       checked: value,
-                                                                      event: { change: function(data){ changeCallback($parent) } }
+                                                                      event: { change: function(){ changeCallback($parent); },
+                                                                               focus: descriptionCallback }
                                                                       ">
                                     <!-- /ko -->
 
                                     <!-- ko if: type.constructor.name === "argtype_e_AT_NUM" -->
                                     <input type="number" data-bind="attr: { name: name },
                                                                     value: value,
-                                                                    event: { change: function(data){ changeCallback($parent) } }
+                                                                    event: { change: function(){ changeCallback($parent); },
+                                                                             focus: descriptionCallback }
                                                                     ">
                                     <!-- /ko -->
 
                                     <!-- ko if: type.constructor.name === "argtype_e_AT_UNUM" -->
                                     <input type="number" min="0" data-bind="attr: { name: name },
                                                                     value: value,
-                                                                    event: { change: function(data){ changeCallback($parent) } }
+                                                                    event: { change: function(){ changeCallback($parent); },
+                                                                             focus: descriptionCallback }
                                                                     ">
                                     <!-- /ko -->
 
@@ -120,14 +130,16 @@
                                     <select data-bind="attr: { name: name },
                                                        options: $root.AT_POS,
                                                        value: value,
-                                                       event: { change: function(data){ changeCallback($parent) } }
+                                                       event: { change: function(){ changeCallback($parent); },
+                                                                focus: descriptionCallback }
                                                        "></select>
                                     <!-- /ko -->
 
                                     <!-- ko if: type.constructor.name === "argtype_e_AT_STRING" -->
                                     <input type="text" data-bind="attr: { name: name },
                                                                   value: value,
-                                                                  event: { change: function(data){ changeCallback($parent) } }
+                                                                  event: { change: function(){ changeCallback($parent); },
+                                                                           focus: descriptionCallback }
                                                                   ">
                                     <!-- /ko -->
 
@@ -135,7 +147,8 @@
                                     <select data-bind="attr: { name: name },
                                                        options: $root.AT_LINE,
                                                        value: value,
-                                                       event: { change: function(data){ changeCallback($parent) } }
+                                                       event: { change: function(){ changeCallback($parent); },
+                                                                focus: descriptionCallback }
                                                        "></select>
                                     <!-- /ko -->
                                 </li>
