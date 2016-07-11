@@ -282,6 +282,9 @@ const auto A8 = 1 | 2;` ],
     let configInputChanged: boolean = true;
     let editorOpened: boolean       = false;
     let configOutputOpened: boolean = false;
+    let editorFocused: boolean      = false;
+    let editorChanged: boolean      = false;
+    let customExampleUsed: boolean  = false;
 
     class Options
     {
@@ -607,7 +610,8 @@ const auto A8 = 1 | 2;` ],
         // ----
 
         // write formated text to editor
-        editorSession.setValue( Uncrustify.uncrustify( option.example ) );
+        let crustyText = customExampleUsed ? editorSession.getValue() : option.example;
+        editorSession.setValue( Uncrustify.uncrustify( crustyText ) );
 
         return true;
     }
@@ -811,6 +815,27 @@ const auto A8 = 1 | 2;` ],
             SelectorCache.FileOutput.style.height = "";
         };
 
+        // custom example handling
+        editorSession.on( "change", function()
+        {
+            if( !editorFocused ) { return; }
+            editorChanged = true;
+        } );
+
+        editor.on( "focus", function()
+        {
+            editorFocused = true;
+        } );
+
+        editor.on( "blur", function()
+        {
+            editorFocused = false;
+            if( !editorChanged ) { return; }
+
+            customExampleUsed = editorSession.getValue() !== "";
+            editorChanged = false;
+        } );
+        // -----------------------
     }
 
 
