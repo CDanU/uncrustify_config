@@ -1,0 +1,43 @@
+{
+  "author": "Daniel Chumak (CDanU)",
+  "name": "uncrustify_config",
+  "description": "Simple frontend for the emscripten interface of Uncrustify.",
+  "license": "GPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdanu/uncrustify_config.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "mkdir -p build && cd build && cmake -DEXECUTABLE_OUTPUT_PATH=../js/ ../uncrustify/emscripten && make emscripten_test",
+    "postinstall": "node ./node_modules/typings/dist/bin.js install && node ./node_modules/webpack/bin/webpack.js",
+    "webpack": "node ./node_modules/webpack/bin/webpack.js",
+    "make": "npm run preinstall && npm run webpack"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "crypto": false
+  },
+  "dependencies": {
+    "brace": "^0.8.0",
+    "css-loader": "^0.23.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "knockout": "^3.4.0",
+    "node-normalize-scss": "^1.3.2",
+    "node-sass": "^3.8.0",
+    "sass-loader": "^4.0.0",
+    "script-loader": "^0.7.0",
+    "source-map-loader": "^0.1.5",
+    "style-loader": "^0.13.1",
+    "ts-loader": "^0.8.2",
+    "typings": "^1.3.1",
+    "url-loader": "^0.5.7"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.5",
+    "webpack": "^1.13.1"
+  },
+  "main": "js/app.js"
+}

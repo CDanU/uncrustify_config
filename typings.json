@@ -1,0 +1,8 @@
+{
+  "name": "uncrustify_config",
+  "globalDependencies": {
+    "ace": "registry:dt/ace",
+    "filesaver": "registry:dt/filesaver",
+    "knockout": "registry:dt/knockout"
+  }
+}

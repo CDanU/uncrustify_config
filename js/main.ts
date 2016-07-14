@@ -2,28 +2,36 @@
     github.com/CDanU/uncrustify_config */
 
 
-/// <reference path="../typings/ace.d.ts" />
-/// <reference path="../typings/knockout.d.ts" />
-/// <reference path="../typings/libUncrustify.d.ts" />
+/// <reference path="../typings/index.d.ts" />
+/// <reference path="../uncrustify/emscripten/libUncrustify.d.ts" />
 /// <reference path="../typings/map.d.ts" />
 
 
 type HTMLElementValue    = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 type OptionPrimitiveType = string | boolean | number;
 
+import * as libUncrustify from "libUncrustify";
+import * as ko from "knockout";
+require( 'brace' );
+require( 'brace/theme/solarized_dark' );
+require( 'brace/mode/javascript' );
+require( 'brace/mode/c_cpp' );
 
 module uncrustify_config
 {
-    const Uncrustify: LibUncrustify.Uncrustify = libUncrustify();
+    const Uncrustify: LibUncrustify.Uncrustify = libUncrustify;
     Uncrustify.set_quiet();
 
-    const editor        = ace.edit( "exampleEditorBox" );
+    const editor = ace.edit( "exampleEditorBox" );
     editor.$blockScrolling = Infinity;
+
     const editorSession = editor.getSession();
     editor.setShowInvisibles( true );
     editor.setShowPrintMargin( true );
     editorSession.setTabSize( 8 );
     editor.setFontSize( "12pt" );
+    editor.setTheme( "ace/theme/solarized_dark" );
+    editorSession.setMode( 'ace/mode/c_cpp' );
 
     namespace SelectorCache
     {
@@ -836,3 +844,4 @@ const auto A8 = 1 | 2;` ],
 
     assignEvents();
 }
+
