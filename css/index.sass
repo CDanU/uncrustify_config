@@ -12,6 +12,7 @@ $menuColor2: darken( $menuColor, 2% )
 $textarea_Background : $menuColor
 
 $mainBackground: #3d3d3d
+$negMainBackground : invert($mainBackground)
 
 $header_Background: darken( $mainBackground, 8)
 
@@ -216,6 +217,9 @@ nav.top
   display: flex
   align-items: center
 
+  input[type=file], input[type=button]
+    display: none
+
 
 .captionOptionBox
   margin-left: auto
@@ -236,3 +240,14 @@ nav.top
 
 .inline
   display: inline-block
+
+.button
+  display: inline-block
+  padding: 5px
+  border: 1px solid $tab_BorderColor
+  cursor: pointer
+  background: $tabBackground_Background
+
+  &:hover
+    background: $tabActive_Background
+    color: $tabHover_Color

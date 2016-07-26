@@ -19,7 +19,13 @@
     <main id="mainBox">
 
         <section id="tab0" class="tabContainer">
-            <h3>Config Input:</h3>
+            <div class="captionBox">
+                <h3>Config Input:</h3>
+                <span class="captionOptionBox">
+                    <input type="file" id="fileInputConfig"><label for="fileInputConfig" class="button">Load Config</label>
+                </span>
+            </div>
+
             <textarea id="configInput"></textarea>
         </section>
 
@@ -166,6 +172,7 @@
                 <span class="captionOptionBox">
                     <label>withDoc</label><input type="checkbox" id="configOutputWithDoc">
                     <label>only_not_default</label><input type="checkbox" id="configOutputOnlyNDefault" checked>
+                    <input type="button" id="saveConfig"><label for="saveConfig" class="button">Save Config</label>
                 </span>
             </div>
 
@@ -178,6 +185,7 @@
                 <div class="captionBox">
                     <h3>File Input:</h3>
                     <img src="img/editorOrientationBttn.png" id="orientationBtn" class="captionOptionBox">
+                    <input type="file" id="fileInputFile"><label for="fileInputFile" class="button captionOptionBox">Load File</label>
                 </div>
 
                 <textarea id="fileInput"></textarea>
@@ -193,6 +201,7 @@
                                            value: fileLang"></select>
                         <label>isFragment:</label>
                         <input type="checkbox" data-bind="checked: isFragment">
+                        <input type="button" id="saveFileFormated"><label for="saveFileFormated" class="button">Save File</label>
                     </span>
                 </div>
 

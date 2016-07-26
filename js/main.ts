@@ -11,6 +11,7 @@ type HTMLElementValue    = HTMLInputElement | HTMLSelectElement | HTMLTextAreaEl
 type OptionPrimitiveType = string | boolean | number;
 
 import * as libUncrustify from "libUncrustify";
+import * as fileSaver from "file-saver";
 import * as ko from "knockout";
 require( 'brace' );
 require( 'brace/theme/solarized_dark' );
@@ -47,9 +48,12 @@ module uncrustify_config
         export const ConfigOutput = < HTMLTextAreaElement > document.getElementById( "configOutput" );
         export const ConfigOutputWithDoc      = < HTMLInputElement > document.getElementById( "configOutputWithDoc" );
         export const ConfigOutputOnlyNDefault = < HTMLInputElement > document.getElementById( "configOutputOnlyNDefault" );
-        export const FileInput  = < HTMLTextAreaElement > document.getElementById( "fileInput" );
-        export const FileOutput = < HTMLTextAreaElement > document.getElementById( "fileOutput" );
-        export const FileOutputIsFragment = < HTMLInputElement > document.getElementById( "fileOutputIsFragment" );
+        export const FileInput        = < HTMLTextAreaElement > document.getElementById( "fileInput" );
+        export const FileOutput       = < HTMLTextAreaElement > document.getElementById( "fileOutput" );
+        export const FileInputConfig  = < HTMLInputElement > document.getElementById( "fileInputConfig" );
+        export const FileInputFile    = < HTMLInputElement > document.getElementById( "fileInputFile" );
+        export const SaveConfig       = < HTMLInputElement > document.getElementById( "saveConfig" );
+        export const SaveFileFormated = < HTMLInputElement > document.getElementById( "saveFileFormated" );
 
     }
 
@@ -768,8 +772,52 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, langEnumObj, isFrag );
     }
 
+    function handleFileSelect( e, onLoadCallback : Function )
+    {
+        e.stopPropagation();
+        e.preventDefault();
+
+        let file;
+        if( e.dataTransfer != null && e.dataTransfer.files != null && e.dataTransfer.files[0] != null )
+        {
+            file = e.dataTransfer.files[0];
+        }
+        else if ( e.target.files != null && e.target.files[0] != null )
+        {
+            file = e.target.files[0];
+        }
+        else { return; }
+        // _____________________________________________________________________
+
+        const reader = new FileReader();
+        reader.onload = function(){
+            onLoadCallback(reader.result);
+        };
+        reader.readAsText( file );
+    }
+
+    function handleDragOver( e )
+    {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    }
+
+    function setConfigInputText( text : string )
+    {
+        SelectorCache.ConfigInput.value = text;
+        configInputChanged = true;
+    }
+
+    function setFileInputText( text : string )
+    {
+        SelectorCache.FileInput.value = text;
+        formatFile();
+    }
+
     function assignEvents()
     {
+
         const tabLen: number = SelectorCache.Tabs.length;
         for( let i: number = 0; i < tabLen; i++ )
         {
@@ -835,8 +883,31 @@ const auto A8 = 1 | 2;` ],
             editorChanged = false;
         } );
         // -----------------------
-    }
 
+
+        SelectorCache.ConfigInput.ondragover = handleDragOver;
+        SelectorCache.ConfigInput.ondrop = function( e ){
+            handleFileSelect( e, setConfigInputText );
+        };
+        SelectorCache.FileInputConfig.onchange = function( e ){
+            handleFileSelect( e, setConfigInputText );
+        };
+
+        SelectorCache.FileInput.ondragover = handleDragOver;
+        SelectorCache.FileInput.ondrop = function( e ){
+            handleFileSelect( e, setFileInputText );
+        };
+        SelectorCache.FileInputFile.onchange = function( e ){
+            handleFileSelect( e, setFileInputText );
+        };
+
+        SelectorCache.SaveConfig.onclick = function(){
+            fileSaver.saveAs( new Blob( [SelectorCache.ConfigOutput.value], { type : 'text' } ), "uncrustify.cfg", false);
+        };
+        SelectorCache.SaveFileFormated.onclick = function(){
+            fileSaver.saveAs( new Blob( [SelectorCache.FileOutput.value], { type : 'text' } ), "formated", false);
+        };
+    }
 
     const ViewModel = new GroupOptionsViewModel();
     buildModel();
