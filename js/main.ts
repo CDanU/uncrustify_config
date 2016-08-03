@@ -54,7 +54,14 @@ module uncrustify_config
         export const FileInputFile    = < HTMLInputElement > document.getElementById( "fileInputFile" );
         export const SaveConfig       = < HTMLInputElement > document.getElementById( "saveConfig" );
         export const SaveFileFormated = < HTMLInputElement > document.getElementById( "saveFileFormated" );
+    }
 
+    enum UpdateSource
+    {
+        Editor       = 0,
+        ConfigOutput = 1,
+        ConfigInput  = 2,
+        None         = 999,
     }
 
     enum TabStates
@@ -289,14 +296,15 @@ const auto A8 = 1 | 2;` ],
     //==========================================================================
 
     let modelBuild: boolean  = false;
-    // initialy set to true to catch the case where a page reload does not clear the text
-    // but no change event is fired
-    let configInputChanged: boolean = true;
-    let editorOpened: boolean       = false;
-    let configOutputOpened: boolean = false;
     let editorFocused: boolean      = false;
     let editorChanged: boolean      = false;
     let customExampleUsed: boolean  = false;
+    // ---
+    //! updateSource: used to specify from which source the Uncrustify config needs
+    //! to be updated, initially it is set to UpdateTarget.ConfigInput to catch
+    //! the case where a page reload does not clear the text but no change event
+    //! is fired
+    let updateSource: UpdateSource = UpdateSource.ConfigInput;
 
     class Options
     {
@@ -497,46 +505,43 @@ const auto A8 = 1 | 2;` ],
 
         SelectorCache.TabContainers[nr].style.display = "flex";
 
-
-        if( nr != TabStates.readConfigFile )
+        // region updateTarget
+        switch( updateSource )
         {
-            if( configInputChanged )
+            case UpdateSource.Editor:
+            {
+                loadSettingsFromModel();
+                break;
+            }
+            case UpdateSource.ConfigInput:
             {
                 loadSettings( SelectorCache.ConfigInput );
-                configInputChanged = false;
+                break;
             }
+            case UpdateSource.ConfigOutput:
+            {
+                loadSettings( SelectorCache.ConfigOutput );
+                break;
+            }
+            default: {break;}
         }
+        updateSource = UpdateSource.None;
+        // endregion
+
+        // region handle tab specific stuff
         switch( nr )
         {
             case TabStates.editConfig:
             {
-                editorOpened = true;
+                updateSource = UpdateSource.Editor;
                 break;
             }
-
             case TabStates.outputConfigFile:
             {
-                if( editorOpened ) { loadSettingsFromModel(); }
                 printSettings();
-                configOutputOpened = true;
                 break;
             }
-
-            case TabStates.fileIO:
-            {
-                if( configOutputOpened )
-                {
-                    loadSettings( SelectorCache.ConfigOutput );
-                }
-                else if( editorOpened ) { loadSettingsFromModel(); }
-                break;
-            }
-
-
-            default:
-            {
-                break;
-            }
+            default: { break; }
         }
 
         return true;
@@ -806,7 +811,7 @@ const auto A8 = 1 | 2;` ],
     function setConfigInputText( text : string )
     {
         SelectorCache.ConfigInput.value = text;
-        configInputChanged = true;
+        updateSource = UpdateSource.ConfigInput;
     }
 
     function setFileInputText( text : string )
@@ -826,12 +831,12 @@ const auto A8 = 1 | 2;` ],
 
         SelectorCache.ConfigInput.onchange = function()
         {
-            configInputChanged = true; // see configInputChanged desc
+            updateSource = UpdateSource.ConfigInput;
         };
 
         SelectorCache.ConfigOutput.onchange = function()
         {
-            loadSettings( SelectorCache.ConfigOutput );
+            updateSource = UpdateSource.ConfigOutput;
         };
 
         SelectorCache.ConfigOutputWithDoc.onchange      = printSettings;
