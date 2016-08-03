@@ -27,11 +27,12 @@ module uncrustify_config
     editor.$blockScrolling = Infinity;
 
     const editorSession = editor.getSession();
-    editor.setShowInvisibles( true );
+    editor.setShowInvisibles( true ); // shows whitespace
     editor.setShowPrintMargin( true );
     editorSession.setTabSize( 8 );
     editor.setFontSize( "12pt" );
     editor.setTheme( "ace/theme/solarized_dark" );
+    // TODO: change language highlighting based on selected option
     editorSession.setMode( 'ace/mode/c_cpp' );
 
     namespace SelectorCache
@@ -175,6 +176,7 @@ module uncrustify_config
         ["cmt_width", ["cmt_sp_after_star_cont"]],
     ] );
 
+    // region exampleStrings
     enum ExampleStringEnum
     {
         noExample,
@@ -269,7 +271,10 @@ const auto A8 = 1 | 2;` ],
         ["utf8_byte", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["utf8_force", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
     ] );
+    // endregion
 
+    // region languageFlags
+    //! formating language options display strings
     const langFlagsStrings = [
         "C",
         "C++",
@@ -282,6 +287,7 @@ const auto A8 = 1 | 2;` ],
         "JavaScript",
     ];
 
+    //! maps Uncrustify language options to display strings
     const stringLangFlagsMap = new Map<string, EmscriptenEnumTypeObject>( [
         [ langFlagsStrings[0], Uncrustify.lang_flag_e.LANG_C ],
         [ langFlagsStrings[1], Uncrustify.lang_flag_e.LANG_CPP ],
@@ -293,11 +299,16 @@ const auto A8 = 1 | 2;` ],
         [ langFlagsStrings[7], Uncrustify.lang_flag_e.LANG_OC ],
         [ langFlagsStrings[8], Uncrustify.lang_flag_e.LANG_ECMA ],
     ] );
+    // endregion
     //==========================================================================
 
+    //! flag that is used to prevent multiple ViewModel initializations
     let modelBuild: boolean  = false;
+    //! flags that are used for handling custom examples
     let editorFocused: boolean      = false;
+    //! flags that are used for handling custom examples
     let editorChanged: boolean      = false;
+    //! flags that are used for handling custom examples
     let customExampleUsed: boolean  = false;
     // ---
     //! updateSource: used to specify from which source the Uncrustify config needs
@@ -308,14 +319,22 @@ const auto A8 = 1 | 2;` ],
 
     class Options
     {
+        //! name of the option
         public name: string;
+        //! type of the option, see Uncrustify.argtype_e
         public type: EmscriptenEnumTypeObject;
+        //! option value, AT_BOOL -> bool, AT_Num -> number, else -> string
         public value: KnockoutObservable<OptionPrimitiveType>;
-        // initially stored as strings, later converted to Options
+        //! stores option dependencies, initialy this variable is of type string[],
+        //! but changes into options[] after the string have been resolved
         public dependencies;
+        //! example on which the foramting will be performed
         public example: string;
+        //! description of the option, consists of short and full description from Uncrustify
         public description: string;
+        //! callback function that is called from the template to set the description
         public descriptionCallback: Function;
+        //! callback function that is called from the template to handle changes
         public changeCallback: Function;
         public resetCallback: Function;
 
@@ -346,7 +365,9 @@ const auto A8 = 1 | 2;` ],
 
     class OptionsGroup
     {
+        // name of the goup
         public name: string;
+        // array of all options that belong to the group
         public options: Options[];
 
         constructor( name: string )
@@ -363,16 +384,27 @@ const auto A8 = 1 | 2;` ],
 
     class GroupOptionsViewModel
     {
+        //! all uncrustify Groups
         public groups: KnockoutObservableArray<OptionsGroup>;
+        //! Uncrustifys text formatting option
         public isFragment: KnockoutObservable<boolean>;
+        //! Uncrustifys text formatting option
         public fileLang: KnockoutObservable<string>;
+        //! lookupMap to find Options
         public lookupMap = new Map<string, Options>();
+        //! Uncrustifys Options for the type AT_IARF
         public AT_IARF = ['ignore', 'add', 'force', 'remove',];
+        //! Uncrustifys Options for the type AT_POS
         public AT_POS  = ['ignore', 'join', 'lead', 'lead_break', 'lead_force', 'trail', 'trail_break', 'trail_force',];
+        //! Uncrustifys Options for the type AT_LINE
         public AT_LINE = ['auto', 'lf', 'crlf', 'cr',];
+        //! used inside the template to display available language options
         public langFlagStrings = langFlagsStrings;
         //----------------------------------------------------------------------
-        
+
+        /**
+         *  builds lookupMap based on the options of the this.groups
+         */
         private fillLookupMapFull()
         {
             for( let group of this.groups() )
@@ -384,6 +416,10 @@ const auto A8 = 1 | 2;` ],
             }
         }
 
+        /**
+         * fills lookupMap based on the options of the passed in group
+         * @param group: group which options will be added to the lookupMap
+         */
         //private fillLookupMap( group: OptionsGroup )
         //{
         //    for( let option of group.options )
@@ -392,6 +428,13 @@ const auto A8 = 1 | 2;` ],
         //    }
         //}
 
+        /**
+         * recursivly resolves string dependencies of Options
+         * @param option: Option which dependencies will be resolved
+         * @param unresolved: empty array that will get filled with unresolved options during the recursive steps
+         * @param resolved: empty array that will get filled with resolved options during the recursive steps
+         * @returns {string[]}: array with all resolved dependencies
+         */
         private resolver( option: Options, unresolved: string[], resolved: string[] )
         {
             unresolved.push( option.name );
@@ -422,6 +465,7 @@ const auto A8 = 1 | 2;` ],
 
             resolved.push( option.name );
 
+            // remove from unresolved
             const index0 = unresolved.indexOf( option.name );
             if( index0 > -1 ) { unresolved.splice( index0, 1 ); }
 
@@ -436,6 +480,9 @@ const auto A8 = 1 | 2;` ],
             }
         };
 
+        /**
+         * calls resolver on every option and to convert string dependencies to option dependencies
+         */
         public resolveDependencies(): void
         {
             // resolves dependencies in order to guarantee all sub dependencies are included
@@ -480,6 +527,14 @@ const auto A8 = 1 | 2;` ],
         }
     }
 
+    /**
+     * alongside the event handlers this function controls the main program flow,
+     * it manages tab and container styles, updates the Uncrustify config and
+     * handles tab specific stuff
+     *
+     * @param nr: n-th tab that is going to be opened, 0-based
+     * @returns {boolean}: false on failure
+     */
     function openTab( nr: number ): boolean
     {
         if( isNaN(nr) || nr < 0 || nr >= SelectorCache.TabContainers.length )
@@ -487,16 +542,16 @@ const auto A8 = 1 | 2;` ],
             return false;
         }
 
-
-        // manage active state of tabs
+        // region manage active style state of tabs
         for( let elem of <any> SelectorCache.Tabs )
         {
             elem.classList.remove( "active" );
         }
 
         SelectorCache.Tabs[nr].classList.add( "active" );
+        // endregion
 
-        // manage visibility of tab containers
+        // region manage visibility of tab containers
         for( let elem of SelectorCache.TabContainers )
         {
             elem.style.display = "none";
@@ -504,6 +559,7 @@ const auto A8 = 1 | 2;` ],
         }
 
         SelectorCache.TabContainers[nr].style.display = "flex";
+        // endregion
 
         // region updateTarget
         switch( updateSource )
@@ -543,16 +599,24 @@ const auto A8 = 1 | 2;` ],
             }
             default: { break; }
         }
+        // endregion
 
         return true;
     }
 
+    /**
+     * Value of passed Element is set as Uncrustifys config, calls updateModel
+     * @param target which value will be set as Uncrustifys config
+     */
     function loadSettings( target: HTMLElementValue ): void
     {
         Uncrustify.loadConfig( target.value );
         updateModel();
     }
 
+    /**
+     * sets Uncrustifys config based on the settings of the ViewModel
+     */
     function loadSettingsFromModel(): void
     {
         ViewModel.lookupMap.forEach( function( option ){
@@ -588,6 +652,9 @@ const auto A8 = 1 | 2;` ],
         } );
     }
 
+    /**
+     * prints current Uncrustify config according to the set output options into SelectorCache.ConfigOutput
+     */
     function printSettings(): void
     {
         const optionDoc: boolean = SelectorCache.ConfigOutputWithDoc.checked;
@@ -595,7 +662,13 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.ConfigOutput.value = Uncrustify.show_config( optionDoc, optionDef );
     }
 
-    // returns true to sim html element default event handling
+    /**
+     * used to change a single option in the Uncrustify configuration via the menu,
+     * resets all Uncrustify options to default and sets the changed option and
+     * its dependencies, handles example output
+     * @param option: Option which value changed
+     * @returns {boolean}: returns true to simulate html element default event handling
+     */
     function optionChange( option: Options ): boolean
     {
         // reset all uncrustify options to default values
@@ -625,6 +698,9 @@ const auto A8 = 1 | 2;` ],
         return true;
     }
 
+    /**
+     * builds Knockout Model from Uncrustifys Groups and Options
+     */
     function buildModel()
     {
         if( modelBuild ) { return; }
@@ -634,9 +710,11 @@ const auto A8 = 1 | 2;` ],
         const option_name_map = Uncrustify.getOptionNameMap();
         let   groupsArr: OptionsGroup[] = [];
 
-        // enumVal : string, enum option name
+        // iterate EmscriptenEnumType Object to get its keys, which are the enum
+        // value names, in this case Group enums
         for( let enumVal in groupEnumValues )
         {
+            // 'values' key is not an enum value name
             if( enumVal === "values" ) { continue; }
 
             // groupEnumValues[ enumVal ] : Object, enum option object
@@ -718,6 +796,9 @@ const auto A8 = 1 | 2;` ],
         modelBuild = true;
     }
 
+    /**
+     *  updates ViewModel based on Uncrustifys currently loaded settings
+     */
     function updateModel()
     {
         ViewModel.lookupMap.forEach( function( option ){
@@ -757,11 +838,18 @@ const auto A8 = 1 | 2;` ],
         } );
     }
 
+    /**
+     * fills SelectorCache.ConfigDescriptionBox with given string
+     */
     function setDescription( text: string )
     {
         SelectorCache.ConfigDescriptionBox.value = text;
     }
 
+    /**
+     * fills SelectorCache.FileOutput with an uncrustifyed value of SelectorCache.FileInput
+     * checks frag and language settings
+     */
     function formatFile()
     {
         const isFrag      = ViewModel.isFragment();
@@ -777,6 +865,13 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, langEnumObj, isFrag );
     }
 
+    /**
+     * handles events from input[type:file] and file drops, only the first file will be read in as text
+     * and passed to the specified callback function
+     *
+     * param e: event which holds filehandles in e.dataTransfer or e.target.files
+     * param onLoadCallback: function that will be called when all filecontent is read as text
+    */
     function handleFileSelect( e, onLoadCallback : Function )
     {
         e.stopPropagation();
@@ -801,6 +896,7 @@ const auto A8 = 1 | 2;` ],
         reader.readAsText( file );
     }
 
+    //! prevents default drag over action
     function handleDragOver( e )
     {
         e.stopPropagation();
@@ -808,26 +904,30 @@ const auto A8 = 1 | 2;` ],
         e.dataTransfer.dropEffect = 'copy';
     }
 
+    //! Sets a given string as value to the ConfigInput Text area, sets the updateTarget
     function setConfigInputText( text : string )
     {
         SelectorCache.ConfigInput.value = text;
         updateSource = UpdateSource.ConfigInput;
     }
 
+    //! Sets a given string as value to the FileInput Text area, calls formatFile();
     function setFileInputText( text : string )
     {
         SelectorCache.FileInput.value = text;
         formatFile();
     }
 
+    //! assigns needed event handlers to the html nodes
     function assignEvents()
     {
-
+        // region tabs
         const tabLen: number = SelectorCache.Tabs.length;
         for( let i: number = 0; i < tabLen; i++ )
         {
             SelectorCache.Tabs[i].onclick = () => openTab( i );
         }
+        // endregion
 
         SelectorCache.ConfigInput.onchange = function()
         {
@@ -846,6 +946,7 @@ const auto A8 = 1 | 2;` ],
         ViewModel.isFragment.subscribe( formatFile );
         ViewModel.fileLang.subscribe( formatFile );
 
+        // region fileIO textarea orientation
         const orientationBtnImg = <HTMLImageElement> document.getElementById( "orientationBtn" );
         orientationBtnImg.onclick = function(): void {
             const oBtnClsList = orientationBtnImg.classList;
@@ -866,8 +967,9 @@ const auto A8 = 1 | 2;` ],
             SelectorCache.FileOutput.style.width  = "";
             SelectorCache.FileOutput.style.height = "";
         };
+        // endregion
 
-        // custom example handling
+        // region custom editor example handling
         editorSession.on( "change", function()
         {
             if( !editorFocused ) { return; }
@@ -887,9 +989,9 @@ const auto A8 = 1 | 2;` ],
             customExampleUsed = editorSession.getValue() !== "";
             editorChanged = false;
         } );
-        // -----------------------
+        // endregion
 
-
+        // region drag&drop + input[type:file]
         SelectorCache.ConfigInput.ondragover = handleDragOver;
         SelectorCache.ConfigInput.ondrop = function( e ){
             handleFileSelect( e, setConfigInputText );
@@ -912,6 +1014,7 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.SaveFileFormated.onclick = function(){
             fileSaver.saveAs( new Blob( [SelectorCache.FileOutput.value], { type : 'text' } ), "formated", false);
         };
+        // endregion
     }
 
     const ViewModel = new GroupOptionsViewModel();
