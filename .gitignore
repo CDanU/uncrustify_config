@@ -1,0 +1,7 @@
+*.js 
+*.css
+*.map
+*.orig
+.idea/
+node_modules/
+typings/
