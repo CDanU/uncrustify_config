@@ -547,6 +547,7 @@ const auto A8 = 1 | 2;` ],
                 }
 
                 case Uncrustify.argtype_e.AT_NUM:
+                case Uncrustify.argtype_e.AT_UNUM:
                 {
                     Uncrustify.set_option( option.name, option.value().toString() );
                     break;
@@ -652,6 +653,7 @@ const auto A8 = 1 | 2;` ],
                     }
 
                     case Uncrustify.argtype_e.AT_NUM:
+                    case Uncrustify.argtype_e.AT_UNUM:
                     {
                         option_setting = parseInt( Uncrustify.get_option( option_map_value.name ) );
                         break;
@@ -719,6 +721,7 @@ const auto A8 = 1 | 2;` ],
                 }
 
                 case Uncrustify.argtype_e.AT_NUM:
+                case Uncrustify.argtype_e.AT_UNUM:
                 {
                     optVal = parseInt( Uncrustify.get_option( option.name ) );
                     break;

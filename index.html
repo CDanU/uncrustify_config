@@ -55,6 +55,13 @@
                                                             event: { change: changeCallback}">
                             <!-- /ko -->
 
+
+                            <!-- ko if: type.constructor.name === "argtype_e_AT_UNUM" -->
+                            <input type="number" min="0" data-bind="attr: { name: name },
+                                                                    value: value,
+                                                                    event: { change: changeCallback}">
+                            <!-- /ko -->
+
                             <!-- ko if: type.constructor.name === "argtype_e_AT_POS" -->
                             <select data-bind="attr: { name: name },
                                                options: $root.AT_POS,
@@ -97,6 +104,13 @@
 
                                     <!-- ko if: type.constructor.name === "argtype_e_AT_NUM" -->
                                     <input type="number" data-bind="attr: { name: name },
+                                                                    value: value,
+                                                                    event: { change: function(data){ changeCallback($parent) } }
+                                                                    ">
+                                    <!-- /ko -->
+
+                                    <!-- ko if: type.constructor.name === "argtype_e_AT_UNUM" -->
+                                    <input type="number" min="0" data-bind="attr: { name: name },
                                                                     value: value,
                                                                     event: { change: function(data){ changeCallback($parent) } }
                                                                     ">
