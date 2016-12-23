@@ -1022,5 +1022,7 @@ const auto A8 = 1 | 2;` ],
     ko.applyBindings( ViewModel );
 
     assignEvents();
+
+    document.getElementById("version").innerHTML = Uncrustify.get_version();
 }
 

@@ -54,6 +54,16 @@ $outTabActive_Background : mix( nth($tabActive_BackgroundColors,1), #050 )
 
 //------------------------------------------------------------------------------
 
+.title, .a_uncRepo
+  color: white
+  text-decoration: none
+  &:hover
+    color: $tabHover_Color
+
+.a_uncRepo
+  float: right
+  font-style: italic
+
 body
   height: 100%
   overflow: hidden
@@ -61,7 +71,6 @@ body
   flex-direction: column
   background-color: $mainBackground
   color: #eee
-
 
 header
   width: 100%
@@ -95,7 +104,6 @@ h3
   background: $header_Background
   margin: 0
   padding: 10px
-
 
 nav.top
   width: 100%
