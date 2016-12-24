@@ -55,6 +55,7 @@ module uncrustify_config
         export const FileInputFile    = < HTMLInputElement > document.getElementById( "fileInputFile" );
         export const SaveConfig       = < HTMLInputElement > document.getElementById( "saveConfig" );
         export const SaveFileFormated = < HTMLInputElement > document.getElementById( "saveFileFormated" );
+        export const ExampleEditorBox = < HTMLDivElement > document.getElementById("exampleEditorBox");
     }
 
     enum UpdateSource
@@ -987,6 +988,16 @@ const auto A8 = 1 | 2;` ],
             if( !editorChanged ) { return; }
 
             customExampleUsed = editorSession.getValue() !== "";
+
+            if(customExampleUsed)
+            {
+                SelectorCache.ExampleEditorBox.classList.add( "custom" );
+            }
+            else
+            {
+                SelectorCache.ExampleEditorBox.classList.remove( "custom" );
+            }
+
             editorChanged = false;
         } );
         // endregion
