@@ -1,8 +1,6 @@
 /** Daniel Chumak | uncrustify_config v0.1.0 | GPLv2+ License 
     github.com/CDanU/uncrustify_config */
 
-$optionMenuWidth: (str-length("trail_force")+1)+ch
-
 $menuWidth: 300px
 $navHeight: 30px
 $headerHeight: 20px
@@ -52,6 +50,28 @@ $outTabActive_Background : mix( nth($tabActive_BackgroundColors,1), #050 )
     background: $tabActive_Background
     border-color: #555
 
+=f_input($type, $unit, $width, $gbC:"white", $bS:"2px", $bT:"ridge", $bC:"#fff")
+  @if ($unit != "ch")
+    @error "only ch supported"
+  @else
+    @if ($type == "text" or $type == "number")
+      width: calc(#{$width} + 20px)
+    @if $type == "select"
+      width: calc(#{$width} + 28px)
+    @if $type == "checkbox"
+      width: auto
+
+  background-color: #{$gbC}
+  border: #{$bS} #{$bT} #{$bC}
+
+@function f_inputMaxW($unit, $width)
+  @if ($unit != "ch")
+    @error "only ch supported"
+  @return #{calc(#{$width} + 28px)}
+
+// type number needs the more place for n chars than type string
+// reduce n by two (f) or zero (c) to display type number input, but still fit n type string chars
+$optionMenuWidth: (str-length("trail_force"))+ch
 //------------------------------------------------------------------------------
 
 .title, .a_uncRepo
@@ -81,16 +101,6 @@ footer
   width: 100%
   height: $footerHeight
 
-
-// lets a given width equally look on both elements
-input,select
-  box-sizing: border-box
-
-
-input
-  padding-left: 3px
-
-
 textarea
   border: 6px solid #333
   padding: 10px
@@ -101,6 +111,7 @@ textarea
 
 #configDescriptionBox
   white-space: pre-wrap
+  resize: vertical
 
 h3
   background: $header_Background
@@ -180,15 +191,43 @@ nav.top
 .custom
   border: 1px solid #880000
 
+input
+  padding-left: 3px
+
+$cfgMenu_Width: 25vw
+$cfgMenu_ulPadL: 10px
+$cfgMenu_optionMarginL: 5px
+$cfgMenu_optionMarginR: 15px
+$scrollBarWidth: 15px
+
 #configMenuBox
   flex: 0 0 auto
-  //min-width: 600px
   color: #FFF
   background-color: $menuColor
   overflow-y: scroll
+  width: 30vw
+  resize: horizontal
+
+  ul, li
+    margin: 0
+    padding: 0
+
+  input[type=checkbox]
+    +f_input("checkbox", "ch", $optionMenuWidth)
+    margin-top: .35rem
+    margin-bottom: .35rem
+  input[type=text], input[type=number]
+    +f_input("text", "ch", $optionMenuWidth)
+  select
+    +f_input("select", "ch", $optionMenuWidth)
+  input, select
+    margin-left: $cfgMenu_optionMarginL
+    margin-right: $cfgMenu_optionMarginR
 
   label
-    font-size: 10pt
+    // random 30px need to be removed, don't know why (f && c)
+    width: calc(100% - #{f_inputMaxW("ch", $optionMenuWidth)} - 30px)
+    font: inherit
     display: inline-block
     overflow: hidden
     text-overflow: ellipsis
@@ -197,31 +236,17 @@ nav.top
     // shrinks li parent elem that is too big
     margin-bottom: -5px
 
-  input
-    width: $optionMenuWidth
-  input[type=checkbox]
-    width: auto
-    margin-top : .35rem
-    margin-bottom : .35rem
-  select
-    width: $optionMenuWidth
   ul
-    padding : 0 0 0 10px
-    > li
-      > input, > select
-        float: right
-        margin-left: 5px
-        margin-right: 15px
+    padding-left : $cfgMenu_ulPadL
   li
     list-style: none
     border-bottom: 1px dashed lighten( $menuColor, 5% )
-    //overflow: auto // used to take height from child elem inputs
-
     ul
       border-top: 1px dashed lighten( $menuColor, 5% )
-      padding: 10px 0 10px 35px
       margin-bottom: 5px
-      margin-left: -10px
+      margin-left: -$cfgMenu_ulPadL
+      padding: 10px 0 10px (3 * $cfgMenu_ulPadL)
+
 
 
 .captionBox
