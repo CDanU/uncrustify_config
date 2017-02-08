@@ -711,12 +711,24 @@ const auto A8 = 1 | 2;` ],
         const option_name_map = Uncrustify.getOptionNameMap();
         let   groupsArr: OptionsGroup[] = [];
 
+
+        let exclude_keys_set = new Set(["UO_option_count",
+                                        "UO_include_category_first",
+                                        "UO_include_category_last",
+                                        "UG_group_count",
+                                        "CT_TOKEN_COUNT_",
+                                        "FLAG_PP",
+                                        "FLAG_DIG",
+                                        "LANG_ALL",
+                                        "LANG_ALLC",
+                                        "values"]); // special
+
         // iterate EmscriptenEnumType Object to get its keys, which are the enum
         // value names, in this case Group enums
         for( let enumVal in groupEnumValues )
         {
-            // 'values' key is not an enum value name
-            if( enumVal === "values" ) { continue; }
+            // filter group enum values
+            if( exclude_keys_set.has(enumVal) ) { continue; }
 
             // groupEnumValues[ enumVal ] : Object, enum option object
             const group_map_value = group_map.get( groupEnumValues[enumVal] );
@@ -732,6 +744,8 @@ const auto A8 = 1 | 2;` ],
 
                 const option_map_value = option_name_map.get( option_enum_value );
                 if( option_map_value == null ) { continue; }
+                // filter option enum values
+                if( exclude_keys_set.has(option_map_value.name) ) { continue; }
 
                 let option_setting: OptionPrimitiveType;
                 switch( option_map_value.type )
