@@ -177,6 +177,10 @@ module uncrustify_config
         ["cmt_width", ["cmt_sp_after_star_cont"]],
     ] );
 
+    // options that do not operate on their own and need a parent option activated
+    const childOptions_depend = new Set< string >([
+    ]);
+
     // region exampleStrings
     enum ExampleStringEnum
     {
@@ -326,6 +330,7 @@ const auto A8 = 1 | 2;` ],
         public type: EmscriptenEnumTypeObject;
         //! option value, AT_BOOL -> bool, AT_Num -> number, else -> string
         public value: KnockoutObservable<OptionPrimitiveType>;
+        public isDependentChild;
         //! stores option dependencies, initialy this variable is of type string[],
         //! but changes into options[] after the string have been resolved
         public dependencies;
@@ -340,7 +345,7 @@ const auto A8 = 1 | 2;` ],
         public resetCallback: Function;
 
         constructor( name: string, type: EmscriptenEnumTypeObject, value: OptionPrimitiveType,
-                     description: string, dependencies: string[], example: string )
+                     description: string, dependencies: string[], example: string, isDependentChild : boolean )
         {
             this.name         = name;
             this.type         = type;
@@ -348,6 +353,7 @@ const auto A8 = 1 | 2;` ],
             this.description  = description;
             this.dependencies = dependencies;
             this.example      = example;
+            this.isDependentChild = isDependentChild;
             // -----------------------------------------------------------------
             this.descriptionCallback = function()
             {
@@ -784,11 +790,18 @@ const auto A8 = 1 | 2;` ],
                 let example: string = optionNameString_Map.get( option_map_value.name );
                 if( example == null ) { example = exampleStringEnum_string_Map.get( ExampleStringEnum.noExampleYet); }
 
+                const isDependentChild : boolean = childOptions_depend.has(option_map_value.name);
+                const description : string = option_map_value.name + ": "
+                                             + option_map_value.short_desc + "\n"
+                                             + option_map_value.long_desc;
+
+
                 const option_object:Options = new Options( option_map_value.name,
                                                            option_map_value.type,
                                                            option_setting,
-                                                           option_map_value.name + ": " + option_map_value.short_desc + "\n" + option_map_value.long_desc,
-                                                           dependencies, example );
+                                                           description,
+                                                           dependencies, example,
+                                                           isDependentChild);
 
                 group_object.addOption( option_object );
             }

@@ -36,6 +36,7 @@
                 <div class="groupContainer">
                     <h3 data-bind="text: name"></h3>
                     <ul data-bind="foreach: options">
+                        <!-- ko if: !isDependentChild -->
                         <li data-bind="event: { click: resetCallback }">
                             <label data-bind="text: name"></label>
 
@@ -158,6 +159,7 @@
                             </ul>
                             <!-- /ko -->
                         </li>
+                        <!-- /ko -->
                     </ul>
                 </div>
             </div>
