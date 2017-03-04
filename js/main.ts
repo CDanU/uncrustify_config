@@ -1191,6 +1191,11 @@ else
         {
             Uncrustify.set_option( "output_tab_size", outputTabSizeOption.value().toString() );
         }
+        const indentWithTabsOption: Options = ViewModel.lookupMap.get( "indent_with_tabs" );
+        if( indentWithTabsOption != null )
+        {
+            Uncrustify.set_option( "indent_with_tabs", indentWithTabsOption.value().toString() );
+        }
         // ----
 
         // write formated text to editor
