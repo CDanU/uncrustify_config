@@ -242,6 +242,14 @@ module uncrustify_config
         example4,
         multiNamespace,
         arith,
+        paren,
+        brace,
+        func,
+        cls,
+        space_misc,
+        if_else,
+        string,
+        indentBraceParent,
     }
 
     const exampleStringEnum_string_Map = new Map<ExampleStringEnum, string>( [
@@ -257,24 +265,33 @@ else{
 leftTextItem = scene->addText(QString::number( 1000 ));}` ],
 //------------------------------------------------------------------------------
         [ ExampleStringEnum.indentBraces,
-`namespace n{
-int f( int a )
+`namespace n
 {
-    //comment1
-    if(true)
+class c :   public a,
+private b
+{
+    struct s
     {
-        auto lFunc = [this](int i){
-                     int b = std::vector<int>({1, 2, 3})[2];
-                     return b+i;
-                 };
-        return lFunc(a);
+        int f( int a )
+        {
+            //comment1
+            if(true)
+            {
+                auto lFunc = [this](int i){
+                             int b = std::vector<int>({1, 2, 3})[2];
+                             return b+i;
+                         };
+                return lFunc(a);
+            }
+            return 1;
+        }
     }
-    return 1;
-} }` ],
+}
+}` ],
         [ ExampleStringEnum.multiNamespace,
 `namespace ns0{
 void func0();
-namespace ns1{
+namespace ns1  {
 void func1();
 void func2();
 void func3();
@@ -290,41 +307,469 @@ void func8();
 }
 }` ],
         [ ExampleStringEnum.arith,
-`const auto A0 = 1 + 2;
-const auto A1 = 1 - 2;
-const auto A2 = 1 / 2;
-const auto A3 = 1 * 2;
-const auto A4 = 1 >> > 2;
-const auto A5 = 1 << 2;
-const auto A6 = 1 >> 2;
-const auto A7 = 1 % 2;
-const auto A8 = 1 | 2;` ],
+`int Aa0=1+2 + -1 + -  1;//1
+int Aaaa1  =  1  - 2; // -1
+float Aaaaaa2 = 1 /  2.0;  //  0.5
+int Aaaaaaaaaa3 = 1 * 2;/* 2 */
+int Aaaaaaaaaaaaa4 = 1 << 2;  /* 4 */
 
-    ] );
+int Aaaaaa5 = 1 >> 2; /* 0 */
+Aaaaaa5++;
+Aaaaaa5  --  ;
+
+
+
+double Aaa7 =  1 % 2; //! 1
+auto Af8 = [=  ](){
+		   return 1 | 2;
+	   }; //<  3
+
+
+bool b = !a||  (!  b  && (c ||  ~d) || ~  e)==  True;
+
+enum tenum  :  unsigned int {e_val0=1,
+	                         e_val1  =  1  };
+
+void func_proto(int i=  5);
+
+bool d = (b  ==  a)  ?  f  :  g; //: qt cmt0
+bool e = (b==a) ? f : g; //~  qt cmt1
+bool e = b ?: f;
+bool e = c ?  : f;`
+    ],
+        [ ExampleStringEnum.paren,
+`
+class t :  public x
+private y
+{
+t::t() : n(7)
+, m(7)
+, o(7)
+, p(7);
+}
+
+int t::operator  +  (int i){
+        return 0;
+}
+
+int t::d_func(bool p1,int p2,  int p3){
+	if(p1)
+		for(;; ) {return 0}
+	if(  !p1  ) {
+		for(;; )  {return 0}
+
+		char a[]  = "This is a test";
+		a[0] = 's';
+		a  [  0  ] = 'a';
+
+		int p = (int)(33/4);
+		int q = (  int  )  (63/4);
+		double r = double(p) * sizeof(int);
+		double s = double  (q) * sizeof  (int);
+	}
+	switch(p2) {
+	case 1:
+		return 0;
+		break;
+	default  :
+		return 9;
+	}
+}
+` ],
+        [ ExampleStringEnum.brace,
+`
+class Null0 {};
+class Null1 {  };
+
+int i = int {3  };
+
+struct a {int j;  };
+
+` ],
+        [ ExampleStringEnum.func,
+`void*p_func0(int i);
+void*   p_func1  (  int i  )  ;
+
+void p_func2();
+void   p_func2  (  )  ;
+
+
+void e_func0(){
+	return(1);
+};
+void   e_func1  (  )  {
+	return  (  1  )  ;
+};
+
+void p_func0(int i){
+	return 1;
+};
+void  p_func1  (  int i  )  {
+	return 1;
+};
+
+
+p_func0();
+p_func0  (  );
+
+e_func1(1);
+e_func0  (  1  )  ;
+
+
+void (*foo)(int);
+void (  *bar  )  (  int  )  ;
+`],
+        [ ExampleStringEnum.cls,
+`
+class t : public x {
+    t() : n(7);
+    t  ()  :  n(  7  );
+
+    t(int i) : n(7);
+    t  (  int i  )  :  n(  7  );
+}
+
+int t::operator*(int i){
+        return 0;
+}
+
+int t  ::  operator  +  (  int i  ){
+        return 0;
+}
+
+int a = s.fun();
+int b = u  ->  fun();
+
+int c = *u;
+int d = *  u;
+
+
+`],
+        [ ExampleStringEnum.space_misc,
+`
+#if defined(FOO)
+    __attribute__((noreturn)) void d0(void);
+#elif defined  (  FOO  )
+    __attribute__((noreturn)) void d1(void);
+#else//sp_endif_cmt0
+    __attribute__((noreturn)) void d2(void);
+#endif  /* sp_endif_cmt
+           1
+         */
+
+if (i > 5) { throw(std::overflow_error("too big")) };
+if (i > 7) { throw  (  std::overflow_error("way too big")  ) };
+
+try  {
+        int i = 1/0;
+}catch(const std::overflow_error& e){
+        return int{1};
+}  catch  (...){
+        return   int  {  0  };
+}
+
+std::set<int> s{ 1,2,3,4,5 };
+std::set<int>   t  { 1,2,3,4,5 };
+
+
+#define   X           80
+#define   SQUARE(a)   (a\\
+                        *  \\
+                       a)
+
+typedef enum { a = 1 }aaa;
+typedef enum { a = 1 }    aaa;
+
+int* a = & b;
+
+extern "C" {
+   void foo();
+}
+
+char* a = new    (char[20]);
+delete[] a;
+
+while(1) ;`],
+        [ ExampleStringEnum.if_else,
+`
+if(!p){
+	return 1;
+}else if(p){
+	return 2;
+}else{
+	return 3;
+}
+
+if  (  !p  )  {
+	return 1;
+}  else if  (  p  )  {
+	return 2;
+}  else  {
+	return 3;
+}
+`],
+        [ ExampleStringEnum.string,
+`
+string a = "<xml>"
+           "<data Parent=\\"%d\\" Name=\\"%s\\">"
+           "<Child Id=\\"%d\\"/>"
+           "</data>"
+           "</xml>";
+
+string b = "Lorem ipsum dolor sit amet, \\
+                    consetetur sadipscing elitr"; //TODO
+`],
+
+        [ ExampleStringEnum.indentBraceParent,
+`// IF|DO:3, FOR|ELSE:4, WHILE|USING:6, SWITCH:7, ELSEIF:8, SYNCHRONIZED:13
+if(true)
+{
+	do
+	{
+		return 1
+	}
+	while(false)
+
+	for(;; )
+	{
+		return 1;
+	}
+}
+else if(false)
+{
+	switch(x)
+	{
+	case 1:
+		break;
+	default:
+		break;
+	}
+}
+else
+{
+	synchronized(this) //TODO set lang to java
+	{
+		return 1;
+	}
+}`]
+
+
+]);
 
     const optionNameString_Map = new Map<string, string>( [
+        ["sp_arith", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_assign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cpp_lambda_assign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cpp_lambda_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_assign_default", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_before_assign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_after_assign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        // sp_enum_paren //OC
+        ["sp_enum_assign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_enum_before_assign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_enum_after_assign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_bool", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_compare", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cond_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cond_colon_before", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cond_colon_after", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cond_question", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cond_question_before", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cond_question_after", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cond_ternary_short", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_before_tr_emb_cmt", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["align_right_cmt_span", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["align_assign_span", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
         ["disable_processing_cmt", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["enable_processing_cmt", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
-        ["indent_brace_parent", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
-        ["indent_braces_no_class", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
-        ["indent_braces_no_func", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
-        ["indent_braces_no_struct", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
-        ["indent_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
-        ["indent_columns", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
-        ["indent_continue", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
-        ["indent_namespace_level", exampleStringEnum_string_Map.get( ExampleStringEnum.multiNamespace) ],
-        ["indent_namespace_limit", exampleStringEnum_string_Map.get( ExampleStringEnum.multiNamespace) ],
-        ["indent_namespace_single_indent", exampleStringEnum_string_Map.get( ExampleStringEnum.multiNamespace) ],
-        ["indent_namespace", exampleStringEnum_string_Map.get( ExampleStringEnum.multiNamespace) ],
-        ["indent_with_tabs", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
         ["input_tab_size", exampleStringEnum_string_Map.get( ExampleStringEnum.example1) ],
         ["newlines", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
         ["output_tab_size", exampleStringEnum_string_Map.get( ExampleStringEnum.example1) ],
-        ["sp_arith", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
         ["tok_split_gte", exampleStringEnum_string_Map.get( ExampleStringEnum.example2) ],
         ["utf8_bom", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["utf8_byte", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
         ["utf8_force", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
+        ["sp_before_sparen", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_inside_sparen", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_inside_sparen_close", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_inside_sparen_open", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_after_sparen", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_sparen_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        //["sp_special_semi", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_semi", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_semi_for", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_semi_for_empty", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_squares", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_inside_square", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_after_comma", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_comma", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+        //["sp_before_ellipsis", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_after_class_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_class_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_after_constr_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_constr_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_before_case_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+        ["sp_after_operator", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_after_operator_sym", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        //["sp_after_operator_sym_empty", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+        ["sp_after_cast", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_inside_paren_cast", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+        ["sp_sizeof_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+        ["sp_inside_braces_enum", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+
+        ["sp_inside_braces_struct", exampleStringEnum_string_Map.get( ExampleStringEnum.brace) ],
+        ["sp_inside_braces", exampleStringEnum_string_Map.get( ExampleStringEnum.brace) ],
+        ["sp_inside_braces_empty", exampleStringEnum_string_Map.get( ExampleStringEnum.brace) ],
+
+        ["sp_type_func", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_func_proto_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_func_proto_paren_empty", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_func_def_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_func_def_paren_empty", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+
+        ["sp_inside_fparens", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_inside_fparen", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+
+        ["sp_inside_tparen", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_after_tparen_close", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+        //["sp_square_fparen", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["sp_fparen_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        //["sp_fparen_dbrace", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_func_call_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_func_call_paren_empty", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+        ["sp_return_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.func) ],
+
+        ["sp_func_call_user_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.noExample) ],
+
+
+
+        ["sp_func_class_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_func_class_paren_empty", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+
+        ["sp_attribute_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        ["sp_defined_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        //["sp_after_throw", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        ["sp_catch_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        //["sp_version_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        //["sp_scope_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        //["sp_super_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        //["sp_this_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["sp_macro", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        ["sp_macro_func", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["sp_brace_typedef", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        //["sp_catch_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        ["sp_brace_catch", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        //["sp_finally_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        //["sp_brace_finally", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["sp_try_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        //["sp_getset_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["sp_word_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        ["sp_word_brace_ns", exampleStringEnum_string_Map.get( ExampleStringEnum.multiNamespace) ],
+
+        ["sp_before_dc", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_after_dc", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+
+        //["sp_d_array_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["sp_else_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.if_else) ],
+        ["sp_brace_else", exampleStringEnum_string_Map.get( ExampleStringEnum.if_else) ],
+
+
+        ["sp_not", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_inv", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_sign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_incdec", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+
+        ["sp_addr", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        ["sp_member", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+
+        ["sp_sign", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_incdec", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+
+        ["sp_before_nl_cont", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["sp_cond_ternary_short", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+
+
+        //["sp_case_label", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        //["sp_range", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+        // not working ?
+        //["sp_after_for_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        //["sp_before_for_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+
+        //["sp_extern_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+
+
+        ["sp_cmt_cpp_start", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cmt_cpp_doxygen", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+        ["sp_cmt_cpp_qttr", exampleStringEnum_string_Map.get( ExampleStringEnum.arith) ],
+
+        ["sp_endif_cmt", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["sp_after_new", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+        ["sp_between_new_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        //["sp_annotation_paren", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],//java
+
+        ["sp_skip_vbrace_tokens", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+        ["force_tab_after_define", exampleStringEnum_string_Map.get( ExampleStringEnum.space_misc) ],
+
+
+        ["indent_columns", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
+        ["indent_continue", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
+
+        ["indent_with_tabs", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
+        ["indent_cmt_with_tabs", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
+
+        ["indent_brace", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
+        ["indent_braces", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
+        ["indent_brace_parent", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraceParent) ],
+        //
+        //
+        ["indent_namespace", exampleStringEnum_string_Map.get( ExampleStringEnum.multiNamespace) ],
+        //d
+        ["indent_class", exampleStringEnum_string_Map.get( ExampleStringEnum.indentBraces) ],
+        ["indent_class_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["indent_class_on_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+        ["indent_constr_colon", exampleStringEnum_string_Map.get( ExampleStringEnum.paren) ],
+
+
+
+
+
+
+        ["indent_align_string", exampleStringEnum_string_Map.get( ExampleStringEnum.string) ],
+        //
+
+
+
+
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+        ["sp_deref", exampleStringEnum_string_Map.get( ExampleStringEnum.cls) ],
+
     ] );
     // endregion
 
