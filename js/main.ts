@@ -56,6 +56,7 @@ module uncrustify_config
         export const SaveConfig       = < HTMLInputElement > document.getElementById( "saveConfig" );
         export const SaveFileFormated = < HTMLInputElement > document.getElementById( "saveFileFormated" );
         export const ExampleEditorBox = < HTMLDivElement > document.getElementById("exampleEditorBox");
+        export const OutputTypeToggle = < HTMLInputElement > document.getElementById("output_toggle");
     }
 
     enum UpdateSource
@@ -1378,10 +1379,11 @@ else
      * fills SelectorCache.FileOutput with an uncrustifyed value of SelectorCache.FileInput
      * checks frag and language settings
      */
-    function formatFile()
+    function processFile()
     {
         const isFrag      = ViewModel.isFragment();
         const langString  = ViewModel.fileLang();
+        const outputType  = SelectorCache.OutputTypeToggle.checked;
         let   langEnumObj = stringLangFlagsMap.get( langString );
 
         if( langEnumObj == null )
@@ -1390,7 +1392,14 @@ else
             langEnumObj = Uncrustify.lang_flag_e.LANG_CPP;
         }
 
-        SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, langEnumObj, isFrag );
+        if(outputType)
+        {
+            SelectorCache.FileOutput.value = Uncrustify.debug( SelectorCache.FileInput.value, langEnumObj, isFrag );
+        }
+        else
+        {
+            SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, langEnumObj, isFrag );
+        }
     }
 
     /**
@@ -1443,7 +1452,7 @@ else
     function setFileInputText( text : string )
     {
         SelectorCache.FileInput.value = text;
-        formatFile();
+        processFile();
     }
 
     //! assigns needed event handlers to the html nodes
@@ -1469,10 +1478,10 @@ else
 
         SelectorCache.ConfigOutputWithDoc.onchange      = printSettings;
         SelectorCache.ConfigOutputOnlyNDefault.onchange = printSettings;
-        SelectorCache.FileInput.onchange = formatFile;
+        SelectorCache.FileInput.onchange = processFile;
 
-        ViewModel.isFragment.subscribe( formatFile );
-        ViewModel.fileLang.subscribe( formatFile );
+        ViewModel.isFragment.subscribe( processFile );
+        ViewModel.fileLang.subscribe( processFile );
 
         // region fileIO textarea orientation
         const orientationBtnImg = <HTMLImageElement> document.getElementById( "orientationBtn" );
@@ -1553,6 +1562,10 @@ else
             fileSaver.saveAs( new Blob( [SelectorCache.FileOutput.value], { type : 'text' } ), "formated", false);
         };
         // endregion
+
+        document.getElementById("output_toggle").onclick = function( e ){
+            processFile();
+        };
     }
 
     const ViewModel = new GroupOptionsViewModel();

@@ -197,9 +197,19 @@
 
             <div class="flex-column">
                 <div class="captionBox">
-                    <h3>File Output:</h3>
+                    <div class="onoffswitch">
+                        <input type="checkbox" class="onoffswitch-checkbox" id="output_toggle">
+                        <label class="onoffswitch-label" for="output_toggle">
+                            <span class="onoffswitch-on">Format:</span>
+                            <span class="onoffswitch-ridge">&nbsp;</span>
+                            <span class="onoffswitch-off">Debug:</span>
+                        </label>
+                    </div>
+
 
                     <span class="captionOptionBox">
+
+
                         <label>language:</label>
                         <select data-bind="options: $root.langFlagStrings,
                                            value: fileLang"></select>

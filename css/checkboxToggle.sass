@@ -1,0 +1,57 @@
+/** Daniel Chumak | uncrustify_config v0.1.4 | GPLv2+ License
+    github.com/CDanU/uncrustify_config_preview */
+$btn_height: 25px
+$btn_width: 125px
+$drag_width: 10%
+
+$h3_size: 19px
+$h3_pad: 10px
+// -----------------------------------------------------------------------------
+
+.onoffswitch
+  width: $btn_width
+  overflow: hidden
+  border: 1px solid #222
+  border-radius: 5px
+  margin: $h3_pad - 2.5px // 2px border + 0.5px random
+  user-select: none
+
+.onoffswitch-label
+  cursor: pointer
+  display: block
+  overflow: hidden
+  height: $btn_height
+  width: 200%
+  transition: margin 0.3s ease-in 0s
+
+  &:hover
+    color: #0F0
+
+.onoffswitch-on, .onoffswitch-off
+  float: left
+  line-height: $btn_height
+  height: $btn_height
+  width: (100% - 4*$drag_width/2)/2 // 200% -> d/2 / /[d | x0 | 2d | x1 | d]
+  font-size: $h3_size
+  font-weight: bold
+
+
+.onoffswitch-ridge
+  width: $drag_width
+  background: #000
+  float: left
+  height: 100%
+
+.onoffswitch-label .onoffswitch-on
+  margin-left: $drag_width/2 // 200%
+
+.onoffswitch-label .onoffswitch-off
+  margin-right: $drag_width/2 // 200%
+  text-align: right
+
+.onoffswitch-checkbox
+  display: none
+
+  &:checked + .onoffswitch-label
+    margin-left: -100%
+    transition: margin 0.3s ease-in 0s
