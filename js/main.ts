@@ -578,14 +578,6 @@ const auto A8 = 1 | 2;` ],
         SelectorCache.ConfigOutput.value = Uncrustify.show_config( optionDoc, optionDef );
     }
 
-    function initUncrustify(): void
-    {
-        if( initialized ) { return; }
-
-        Uncrustify.initialize();
-        initialized = true;
-    }
-
     // returns true to sim html element default event handling
     function optionChange( option: Options ): boolean
     {
@@ -611,7 +603,7 @@ const auto A8 = 1 | 2;` ],
 
         // write formated text to editor
         let crustyText = customExampleUsed ? editorSession.getValue() : option.example;
-        editorSession.setValue( Uncrustify.uncrustify( crustyText ) );
+        editorSession.setValue( Uncrustify.uncrustify( crustyText, Uncrustify.lang_flag_e.LANG_CPP ) );
 
         return true;
     }
@@ -765,8 +757,7 @@ const auto A8 = 1 | 2;` ],
             langEnumObj = Uncrustify.lang_flag_e.LANG_CPP;
         }
 
-        Uncrustify.set_language( langEnumObj );
-        SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, isFrag );
+        SelectorCache.FileOutput.value = Uncrustify.uncrustify( SelectorCache.FileInput.value, langEnumObj, isFrag );
     }
 
     function assignEvents()
@@ -840,7 +831,6 @@ const auto A8 = 1 | 2;` ],
 
 
     const ViewModel = new GroupOptionsViewModel();
-    initUncrustify();
     buildModel();
     ko.applyBindings( ViewModel );
 
