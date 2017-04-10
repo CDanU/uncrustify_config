@@ -38,7 +38,7 @@
                     <ul data-bind="foreach: options">
                         <!-- ko if: !isDependentChild -->
                         <li data-bind="event: { click: resetCallback }">
-                            <label data-bind="text: name"></label>
+                            <label data-bind="text: name, attr: {name: name}"></label>
 
                             <!-- ko if: type.constructor.name === "argtype_e_AT_IARF" -->
                             <select data-bind="attr: { name: name },

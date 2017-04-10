@@ -1455,6 +1455,106 @@ else
         processFile();
     }
 
+    function processGetParam()
+    {
+        const urlSplit = window.location.href.split('?', 2);
+        if(urlSplit.length < 2)
+        {
+            return;
+        }
+        const kvPairs = urlSplit[1].split('&');
+        if(kvPairs.length == 1 && kvPairs[0] === '')
+        {
+            return;
+        }
+
+        const param = {
+            tab: "tab",
+            config: "config",
+            file: "file",
+            option: "option",
+            setting: "setting",
+            example: "example",
+        };
+        let paramMap = new Map<string, string>();
+
+        for(const pair of kvPairs)
+        {
+            const kvArray = pair.split('=', 2);
+
+            if(kvArray.length < 2)
+            {
+                continue;
+            }
+            const p_key = decodeURI(kvArray[0]);
+            const p_value = decodeURI(kvArray[1]);
+            paramMap.set(p_key, p_value);
+        }
+
+
+        if(paramMap.has(param.config))
+        {
+            let txt = "";
+            try
+            {
+                txt = atob(decodeURIComponent(paramMap.get(param.config)));
+            }
+            catch(e){/*ignore*/}
+            if(txt !== "") {setConfigInputText(txt);}
+        }
+        if(paramMap.has(param.file))
+        {
+            let txt = "";
+            try
+            {
+                txt = atob(decodeURIComponent(paramMap.get(param.file)));
+            }
+            catch(e){/*ignore*/}
+            if(txt !== "") {setFileInputText(txt);}
+        }
+        if(paramMap.has(param.tab))
+        {
+            const tabNr = parseInt(paramMap.get(param.tab));
+            openTab(tabNr);
+        }
+        if(paramMap.has(param.option))
+        {
+            const optionName = paramMap.get(param.option);
+            const label = document.querySelector("label[name="+optionName+"]");
+            if(label == null) {return;}
+
+            const option = ViewModel.lookupMap.get(optionName);
+
+            openTab(TabStates.editConfig);
+            label.scrollIntoView();
+
+            if(paramMap.has(param.setting))
+            {
+                option.value(paramMap.get(param.setting));
+            }
+            if(paramMap.has(param.example))
+            {
+                let txt = "";
+                try
+                {
+                    txt = atob(decodeURIComponent(paramMap.get(param.example)));
+                }
+                catch(e){/*ignore*/}
+
+                if(txt !== "")
+                {
+                    editorSession.setValue(txt);
+
+                    SelectorCache.ExampleEditorBox.classList.add( "custom" );
+                    customExampleUsed = true;
+                    editorChanged = false;
+
+                    option.resetCallback(option);
+                }
+            }
+        }
+    }
+
     //! assigns needed event handlers to the html nodes
     function assignEvents()
     {
@@ -1575,5 +1675,6 @@ else
     assignEvents();
 
     document.getElementById("version").innerHTML = Uncrustify.get_version();
+    processGetParam();
 }
 
