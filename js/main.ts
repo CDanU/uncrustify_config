@@ -1,4 +1,4 @@
-/** Daniel Chumak | uncrustify_config v0.1.0 | GPLv2+ License 
+/** Daniel Chumak | uncrustify_config v0.1.7 | GPLv2+ License
     github.com/CDanU/uncrustify_config */
 
 
