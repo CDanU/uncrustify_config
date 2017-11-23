@@ -152,7 +152,7 @@ module uncrustify_config
                                   "align_single_line_func", "align_single_line_brace",
                                   "align_var_def_colon", "align_var_def_attribute",
                                   "align_var_def_colon_gap", "align_var_def_inline" ] ],
-        ["align_struct_init_span", ["align_number_left"]],
+        ["align_struct_init_span", ["align_number_right"]],
         ["align_typedef_span", ["align_typedef_gap", "align_typedef_star_style", "align_typedef_amp_style"]],
         ["align_mix_var_proto", ["align_func_proto_span"]],
         ["align_func_proto_span", ["align_func_proto_gap", "align_on_operator"]],
