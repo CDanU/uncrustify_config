@@ -1,0 +1,23 @@
+namespace n
+{
+class c :   public a,
+private b
+{
+    struct s
+    {
+        int f( int a )
+        {
+            //comment1
+            if(true)
+            {
+                auto lFunc = [this](int i){
+                             int b = std::vector<int>({1, 2, 3})[2];
+                             return b+i;
+                         };
+                return lFunc(a);
+            }
+            return 1;
+        }
+    }
+}
+}

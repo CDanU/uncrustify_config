@@ -1,0 +1,29 @@
+int Aa0=1+2 + -1 + -  1;//1
+int Aaaa1  =  1  - 2; // -1
+float Aaaaaa2 = 1 /  2.0;  //  0.5
+int Aaaaaaaaaa3 = 1 * 2;/* 2 */
+int Aaaaaaaaaaaaa4 = 1 << 2;  /* 4 */
+
+int Aaaaaa5 = 1 >> 2; /* 0 */
+Aaaaaa5++;
+Aaaaaa5  --  ;
+
+
+
+double Aaa7 =  1 % 2; //! 1
+auto Af8 = [=  ](){
+		   return 1 | 2;
+	   }; //<  3
+
+
+bool b = !a||  (!  b  && (c ||  ~d) || ~  e)==  True;
+
+enum tenum  :  unsigned int {e_val0=1,
+	                         e_val1  =  1  };
+
+void func_proto(int i=  5);
+
+bool d = (b  ==  a)  ?  f  :  g; //: qt cmt0
+bool e = (b==a) ? f : g; //~  qt cmt1
+bool e = b ?: f;
+bool e = c ?  : f;

@@ -1,0 +1,31 @@
+void*p_func0(int i);
+void*   p_func1  (  int i  )  ;
+
+void p_func2();
+void   p_func2  (  )  ;
+
+
+void e_func0(){
+	return(1);
+};
+void   e_func1  (  )  {
+	return  (  1  )  ;
+};
+
+void p_func0(int i){
+	return 1;
+};
+void  p_func1  (  int i  )  {
+	return 1;
+};
+
+
+p_func0();
+p_func0  (  );
+
+e_func1(1);
+e_func0  (  1  )  ;
+
+
+void (*foo)(int);
+void (  *bar  )  (  int  )  ;

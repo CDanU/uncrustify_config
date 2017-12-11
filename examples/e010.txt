@@ -1,0 +1,22 @@
+class t : public x {
+    t() : n(7);
+    t  ()  :  n(  7  );
+
+    t(int i) : n(7);
+    t  (  int i  )  :  n(  7  );
+}
+
+int t::operator*(int i){
+        return 0;
+}
+
+int t  ::  operator  +  (  int i  ){
+        return 0;
+}
+
+int a = s.fun();
+int b = u  ->  fun();
+
+int c = *u;
+int d = *  u;
+

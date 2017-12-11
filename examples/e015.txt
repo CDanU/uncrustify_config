@@ -1,0 +1,31 @@
+// IF|DO:3, FOR|ELSE:4, WHILE|USING:6, SWITCH:7, ELSEIF:8, SYNCHRONIZED:13
+if(true)
+{
+	do
+	{
+		return 1
+	}
+	while(false)
+
+	for(;; )
+	{
+		return 1;
+	}
+}
+else if(false)
+{
+	switch(x)
+	{
+	case 1:
+		break;
+	default:
+		break;
+	}
+}
+else
+{
+	synchronized(this) //TODO set lang to java
+	{
+		return 1;
+	}
+}

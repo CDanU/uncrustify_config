@@ -16,12 +16,12 @@ module.exports = {
                 test: /\.png$/,
                 loader: 'url-loader?limit=10000'
             },
-            { 
-                test: /\.ts$/, 
-                loader: 'ts-loader' 
+            {
+                test: /\.ts$/,
+                loader: 'ts-loader'
             },
             {
-                test: /\.css$/, 
+                test: /\.css$/,
                 loader: ExtractTextPlugin.extract("style-loader", "css-loader")
             },
             {

@@ -1,0 +1,43 @@
+#if defined(FOO)
+    __attribute__((noreturn)) void d0(void);
+#elif defined  (  FOO  )
+    __attribute__((noreturn)) void d1(void);
+#else//sp_endif_cmt0
+    __attribute__((noreturn)) void d2(void);
+#endif  /* sp_endif_cmt
+           1
+         */
+
+if (i > 5) { throw(std::overflow_error("too big")) };
+if (i > 7) { throw  (  std::overflow_error("way too big")  ) };
+
+try  {
+        int i = 1/0;
+}catch(const std::overflow_error& e){
+        return int{1};
+}  catch  (...){
+        return   int  {  0  };
+}
+
+std::set<int> s{ 1,2,3,4,5 };
+std::set<int>   t  { 1,2,3,4,5 };
+
+
+#define   X           80
+#define   SQUARE(a)   (a\\
+                        *  \\
+                       a)
+
+typedef enum { a = 1 }aaa;
+typedef enum { a = 1 }    aaa;
+
+int* a = & b;
+
+extern "C" {
+   void foo();
+}
+
+char* a = new    (char[20]);
+delete[] a;
+
+while(1) ;

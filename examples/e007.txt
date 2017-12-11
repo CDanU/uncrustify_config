@@ -1,0 +1,36 @@
+class t :  public x
+private y
+{
+t::t() : n(7)
+, m(7)
+, o(7)
+, p(7);
+}
+
+int t::operator  +  (int i){
+        return 0;
+}
+
+int t::d_func(bool p1,int p2,  int p3){
+	if(p1)
+		for(;; ) {return 0}
+	if(  !p1  ) {
+		for(;; )  {return 0}
+
+		char a[]  = "This is a test";
+		a[0] = 's';
+		a  [  0  ] = 'a';
+
+		int p = (int)(33/4);
+		int q = (  int  )  (63/4);
+		double r = double(p) * sizeof(int);
+		double s = double  (q) * sizeof  (int);
+	}
+	switch(p2) {
+	case 1:
+		return 0;
+		break;
+	default  :
+		return 9;
+	}
+}

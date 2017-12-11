@@ -1,0 +1,7 @@
+class Null0 {};
+class Null1 {  };
+
+int i = int {3  };
+
+struct a {int j;  };
+

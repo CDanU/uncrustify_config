@@ -1,0 +1,4 @@
+void f(list<list<B>>=val);
+else{
+//double tickNumber = (leftRange/(double)lineLength)*i;
+leftTextItem = scene->addText(QString::number( 1000 ));}
