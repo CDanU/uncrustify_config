@@ -12,7 +12,8 @@
     "preinstall": "mkdir -p build && cd build && cmake -DEXECUTABLE_OUTPUT_PATH=../js/ ../uncrustify/emscripten && make emscripten_test",
     "postinstall": "node ./node_modules/typings/dist/bin.js install && node ./node_modules/webpack/bin/webpack.js",
     "webpack": "node ./node_modules/webpack/bin/webpack.js",
-    "make": "npm run preinstall && npm run webpack"
+    "make": "npm run preinstall && npm run webpack",
+    "dev": "webpack -d --watch"
   },
   "browser": {
     "fs": false,
@@ -38,8 +39,9 @@
     "url-loader": "^0.5.7"
   },
   "devDependencies": {
-    "@types/node": "^7.0.5",
-    "webpack": "^1.13.1"
+    "@types/node": "^7.0.50",
+    "extract-text-webpack-plugin": "^2.0.0",
+    "webpack": "^3.0.0"
   },
   "main": "js/app.js"
 }

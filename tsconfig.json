@@ -4,7 +4,8 @@
         "target": "es5",
         "noImplicitAny": false,
         "sourceMap": true,
-        "types": ["node"]
+        "types": ["node"],
+        "typeRoots" : ["./typings", "./node_modules/@types/"]
     },
     "files": [
         "js/main.ts"
