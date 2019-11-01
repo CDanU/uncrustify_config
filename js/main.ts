@@ -1,10 +1,7 @@
 /** Daniel Chumak | uncrustify_config v0.1.8 | GPLv2+ License
     github.com/CDanU/uncrustify_config */
 
-
-/// <reference path="../typings/index.d.ts" />
 /// <reference path="../uncrustify/emscripten/libUncrustify.d.ts" />
-/// <reference path="../typings/map.d.ts" />
 
 
 type HTMLElementValue    = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;

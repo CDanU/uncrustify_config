@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "preinstall": "mkdir -p build && cd build && cmake -DEXECUTABLE_OUTPUT_PATH=../js/ ../uncrustify/emscripten && make emscripten_test",
-    "postinstall": "node ./node_modules/typings/dist/bin.js install && node ./node_modules/webpack/bin/webpack.js",
+    "postinstall": "node ./node_modules/webpack/bin/webpack.js && node_modules/copyfiles/copyfiles --flat ./index.html ./dist/ && node_modules/copyfiles/copyfiles ./img/* ./dist/img/",
     "webpack": "node ./node_modules/webpack/bin/webpack.js",
     "make": "npm run preinstall && npm run webpack",
     "dev": "webpack -d --watch"
@@ -21,6 +21,9 @@
     "crypto": false
   },
   "dependencies": {
+    "@types/ace": "0.0.42",
+    "@types/file-saver": "^2.0.1",
+    "@types/knockout": "^3.4.66",
     "brace": "^0.11.0",
     "core-util-is": "^1.0.2",
     "css-loader": "^3.2.0",
@@ -33,7 +36,6 @@
     "raw-loader": "^3.1.0",
     "sass-loader": "^8.0.0",
     "script-loader": "^0.7.0",
-    "typings": "^2.1.0",
     "source-map-loader": "^0.2.4",
     "style-loader": "^1.0.0",
     "ts-loader": "^6.2.1",

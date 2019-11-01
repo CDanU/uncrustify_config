@@ -5,7 +5,6 @@
         "noImplicitAny": false,
         "sourceMap": true,
         "types": ["node"],
-        "typeRoots" : ["./typings", "./node_modules/@types/"]
     },
     "files": [
         "js/main.ts"
