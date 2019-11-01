@@ -8,7 +8,7 @@
 
 <body>
     <header>
-        <a class="title" href="https://github.com/CDanU/uncrustify_config_preview">uncrustify_config v0.1.8</a>
+        <a class="title" href="https://github.com/CDanU/uncrustify_config_preview">uncrustify_config v0.2.0</a>
     </header>
 
     <nav class="top">
@@ -40,7 +40,7 @@
                         <li data-bind="event: { click: resetCallback }">
                             <label data-bind="text: name, attr: {name: name}"></label>
 
-                            <!-- ko if: type.constructor.name === "argtype_e_AT_IARF" -->
+                            <!-- ko if: type.constructor.name === "OptionType_IARF" -->
                             <select data-bind="attr: { name: name },
                                                options: $root.AT_IARF,
                                                value: value,
@@ -48,28 +48,28 @@
                                                         focus: resetCallback }"></select>
                             <!-- /ko -->
 
-                            <!-- ko if: type.constructor.name === "argtype_e_AT_BOOL" -->
+                            <!-- ko if: type.constructor.name === "OptionType_BOOL" -->
                             <input type="checkbox" data-bind="attr: { name: name },
                                                               checked: value,
                                                               event: { change: changeCallback,
                                                                        focus: resetCallback }">
                             <!-- /ko -->
 
-                            <!-- ko if: type.constructor.name === "argtype_e_AT_NUM" -->
+                            <!-- ko if: type.constructor.name === "OptionType_NUM" -->
                             <input type="number" data-bind="attr: { name: name },
                                                             value: value,
                                                             event: { change: changeCallback,
                                                                      focus: resetCallback }">
                             <!-- /ko -->
 
-                            <!-- ko if: type.constructor.name === "argtype_e_AT_UNUM" -->
+                            <!-- ko if: type.constructor.name === "OptionType_UNUM" -->
                             <input type="number" min="0" data-bind="attr: { name: name },
                                                                     value: value,
                                                                     event: { change: changeCallback,
                                                                              focus: resetCallback }">
                             <!-- /ko -->
 
-                            <!-- ko if: type.constructor.name === "argtype_e_AT_POS" -->
+                            <!-- ko if: type.constructor.name === "OptionType_TOKENPOS" -->
                             <select data-bind="attr: { name: name },
                                                options: $root.AT_POS,
                                                value: value,
@@ -77,14 +77,14 @@
                                                         focus: resetCallback }"></select>
                             <!-- /ko -->
 
-                            <!-- ko if: type.constructor.name === "argtype_e_AT_STRING" -->
+                            <!-- ko if: type.constructor.name === "OptionType_STRING" -->
                             <input type="text" data-bind="attr: { name: name },
                                                           value: value,
                                                           event: { change: changeCallback,
                                                                    focus: resetCallback }">
                             <!-- /ko -->
 
-                            <!-- ko if: type.constructor.name === "argtype_e_AT_LINE" -->
+                            <!-- ko if: type.constructor.name === "OptionType_LINEEND" -->
                             <select data-bind="attr: { name: name },
                                                options: $root.AT_LINE,
                                                value: value,
@@ -97,7 +97,7 @@
                                 <li data-bind="event: { click: function(){ return resetCallback($parent)} }, clickBubble: false">
                                     <label data-bind="text: name"></label>
 
-                                    <!-- ko if: type.constructor.name === "argtype_e_AT_IARF" -->
+                                    <!-- ko if: type.constructor.name === "OptionType_IARF" -->
                                     <select data-bind="attr: { name: name },
                                                        options: $root.AT_IARF,
                                                        value: value,
@@ -106,7 +106,7 @@
                                                        "></select>
                                     <!-- /ko -->
 
-                                    <!-- ko if: type.constructor.name === "argtype_e_AT_BOOL" -->
+                                    <!-- ko if: type.constructor.name === "OptionType_BOOL" -->
                                     <input type="checkbox" data-bind="attr: { name: name },
                                                                       checked: value,
                                                                       event: { change: function(){ changeCallback($parent); },
@@ -114,7 +114,7 @@
                                                                       ">
                                     <!-- /ko -->
 
-                                    <!-- ko if: type.constructor.name === "argtype_e_AT_NUM" -->
+                                    <!-- ko if: type.constructor.name === "OptionType_NUM" -->
                                     <input type="number" data-bind="attr: { name: name },
                                                                     value: value,
                                                                     event: { change: function(){ changeCallback($parent); },
@@ -122,7 +122,7 @@
                                                                     ">
                                     <!-- /ko -->
 
-                                    <!-- ko if: type.constructor.name === "argtype_e_AT_UNUM" -->
+                                    <!-- ko if: type.constructor.name === "OptionType_UNUM" -->
                                     <input type="number" min="0" data-bind="attr: { name: name },
                                                                     value: value,
                                                                     event: { change: function(){ changeCallback($parent); },
@@ -130,7 +130,7 @@
                                                                     ">
                                     <!-- /ko -->
 
-                                    <!-- ko if: type.constructor.name === "argtype_e_AT_POS" -->
+                                    <!-- ko if: type.constructor.name === "OptionType_TOKENPOS" -->
                                     <select data-bind="attr: { name: name },
                                                        options: $root.AT_POS,
                                                        value: value,
@@ -139,7 +139,7 @@
                                                        "></select>
                                     <!-- /ko -->
 
-                                    <!-- ko if: type.constructor.name === "argtype_e_AT_STRING" -->
+                                    <!-- ko if: type.constructor.name === "OptionType_STRING" -->
                                     <input type="text" data-bind="attr: { name: name },
                                                                   value: value,
                                                                   event: { change: function(){ changeCallback($parent); },
@@ -147,7 +147,7 @@
                                                                   ">
                                     <!-- /ko -->
 
-                                    <!-- ko if: type.constructor.name === "argtype_e_AT_LINE" -->
+                                    <!-- ko if: type.constructor.name === "OptionType_LINEEND" -->
                                     <select data-bind="attr: { name: name },
                                                        options: $root.AT_LINE,
                                                        value: value,

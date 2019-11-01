@@ -1,4 +1,4 @@
-/** Daniel Chumak | uncrustify_config v0.1.8 | GPLv2+ License
+/** Daniel Chumak | uncrustify_config v0.2.0 | GPLv2+ License
     github.com/CDanU/uncrustify_config */
 
 /// <reference path="../uncrustify/emscripten/libUncrustify.d.ts" />
@@ -10,7 +10,8 @@ type OptionPrimitiveType = string | boolean | number;
 import * as libUncrustify from "libUncrustify";
 import * as fileSaver from "file-saver";
 import * as ko from "knockout";
-require( 'brace' );
+import * as ace from "brace"
+
 require( 'brace/theme/solarized_dark' );
 require( 'brace/mode/javascript' );
 require( 'brace/mode/c_cpp' );
@@ -18,7 +19,7 @@ require( 'brace/mode/c_cpp' );
 module uncrustify_config
 {
     const Uncrustify: LibUncrustify.Uncrustify = libUncrustify;
-    Uncrustify.set_quiet();
+    Uncrustify.quiet();
 
     const editor = ace.edit( "exampleEditorBox" );
     editor.$blockScrolling = Infinity;
@@ -595,16 +596,16 @@ module uncrustify_config
     ];
 
     //! maps Uncrustify language options to display strings
-    const stringLangFlagsMap = new Map<string, EmscriptenEnumTypeObject>( [
-        [ langFlagsStrings[0], Uncrustify.lang_flag_e.LANG_C ],
-        [ langFlagsStrings[1], Uncrustify.lang_flag_e.LANG_CPP ],
-        [ langFlagsStrings[2], Uncrustify.lang_flag_e.LANG_D ],
-        [ langFlagsStrings[3], Uncrustify.lang_flag_e.LANG_CS ],
-        [ langFlagsStrings[4], Uncrustify.lang_flag_e.LANG_VALA ],
-        [ langFlagsStrings[5], Uncrustify.lang_flag_e.LANG_JAVA ],
-        [ langFlagsStrings[6], Uncrustify.lang_flag_e.LANG_PAWN ],
-        [ langFlagsStrings[7], Uncrustify.lang_flag_e.LANG_OC ],
-        [ langFlagsStrings[8], Uncrustify.lang_flag_e.LANG_ECMA ],
+    const stringLangFlagsMap = new Map<string, LibUncrustify.LanguageValue>( [
+        [ langFlagsStrings[0], Uncrustify.Language.C ],
+        [ langFlagsStrings[1], Uncrustify.Language.CPP ],
+        [ langFlagsStrings[2], Uncrustify.Language.D ],
+        [ langFlagsStrings[3], Uncrustify.Language.CS ],
+        [ langFlagsStrings[4], Uncrustify.Language.VALA ],
+        [ langFlagsStrings[5], Uncrustify.Language.JAVA ],
+        [ langFlagsStrings[6], Uncrustify.Language.PAWN ],
+        [ langFlagsStrings[7], Uncrustify.Language.OC ],
+        [ langFlagsStrings[8], Uncrustify.Language.ECMA ],
     ] );
     // endregion
     //==========================================================================
@@ -629,9 +630,9 @@ module uncrustify_config
         //! name of the option
         public name: string;
         //! type of the option, see Uncrustify.argtype_e
-        public type: EmscriptenEnumTypeObject;
+        public type: LibUncrustify.OptionTypeValue;
         //! option value, AT_BOOL -> bool, AT_Num -> number, else -> string
-        public value: KnockoutObservable<OptionPrimitiveType>;
+        public value: ko.Observable<OptionPrimitiveType>;
         public isDependentChild;
         //! stores option dependencies, initialy this variable is of type string[],
         //! but changes into options[] after the string have been resolved
@@ -646,8 +647,15 @@ module uncrustify_config
         public changeCallback: Function;
         public resetCallback: Function;
 
-        constructor( name: string, type: EmscriptenEnumTypeObject, value: OptionPrimitiveType,
-                     description: string, dependencies: string[], example: string, isDependentChild : boolean )
+        constructor ( 
+            name: string, 
+            type: LibUncrustify.OptionTypeValue, 
+            value: OptionPrimitiveType,
+            description: string, 
+            dependencies: string[], 
+            example: string, 
+            isDependentChild : boolean 
+        )
         {
             this.name         = name;
             this.type         = type;
@@ -694,11 +702,11 @@ module uncrustify_config
     class GroupOptionsViewModel
     {
         //! all uncrustify Groups
-        public groups: KnockoutObservableArray<OptionsGroup>;
+        public groups: ko.ObservableArray<OptionsGroup>;
         //! Uncrustifys text formatting option
-        public isFragment: KnockoutObservable<boolean>;
+        public isFragment: ko.Observable<boolean>;
         //! Uncrustifys text formatting option
-        public fileLang: KnockoutObservable<string>;
+        public fileLang: ko.Observable<string>;
         //! lookupMap to find Options
         public lookupMap = new Map<string, Options>();
         //! Uncrustifys Options for the type AT_IARF
@@ -919,7 +927,7 @@ module uncrustify_config
      */
     function loadSettings( target: HTMLElementValue ): void
     {
-        Uncrustify.loadConfig( target.value );
+        Uncrustify.load_config( target.value );
         updateModel();
     }
 
@@ -931,25 +939,26 @@ module uncrustify_config
         ViewModel.lookupMap.forEach( function( option ){
             switch( option.type )
             {
-                case Uncrustify.argtype_e.AT_IARF:
-                case Uncrustify.argtype_e.AT_POS:
-                case Uncrustify.argtype_e.AT_LINE:
-                case Uncrustify.argtype_e.AT_STRING:
+                case Uncrustify.OptionType.IARF:
+                case Uncrustify.OptionType.TOKENPOS:
+                case Uncrustify.OptionType.LINEEND:
+                case Uncrustify.OptionType.STRING:
                 {
-                    Uncrustify.set_option( option.name, < string > option.value() );
+                    Uncrustify.option_set_value( option.name, < string > option.value() );
                     break;
                 }
 
-                case Uncrustify.argtype_e.AT_BOOL:
+                case Uncrustify.OptionType.BOOL:
                 {
-                    Uncrustify.set_option( option.name, option.value() === true ? "true" : "false" );
+                    Uncrustify.option_set_value( option.name, option.value() === true ? "true" : "false" );
                     break;
                 }
 
-                case Uncrustify.argtype_e.AT_NUM:
-                case Uncrustify.argtype_e.AT_UNUM:
+                case Uncrustify.OptionType.NUM:
+                case Uncrustify.OptionType.UNUM:
                 {
-                    Uncrustify.set_option( option.name, option.value().toString() );
+                    
+                    Uncrustify.option_set_value( option.name, option.value().toString() );
                     break;
                 }
 
@@ -981,33 +990,33 @@ module uncrustify_config
     function optionChange( option: Options ): boolean
     {
         // reset all uncrustify options to default values
-        Uncrustify.set_option_defaults();
+        Uncrustify.reset_options();
 
         // set changed option
-        Uncrustify.set_option( option.name, option.value().toString() );
+        Uncrustify.option_set_value( option.name, option.value().toString() );
 
         // set the dependencies of the option
         for( let dependency of option.dependencies )
         {
-            Uncrustify.set_option( dependency.name, dependency.value().toString() );
+            Uncrustify.option_set_value( dependency.name, dependency.value().toString() );
         }
 
         // output_tab_size seems to be a global dependency
         const outputTabSizeOption: Options = ViewModel.lookupMap.get( "output_tab_size" );
         if( outputTabSizeOption != null )
         {
-            Uncrustify.set_option( "output_tab_size", outputTabSizeOption.value().toString() );
+            Uncrustify.option_set_value( "output_tab_size", outputTabSizeOption.value().toString() );
         }
         const indentWithTabsOption: Options = ViewModel.lookupMap.get( "indent_with_tabs" );
         if( indentWithTabsOption != null )
         {
-            Uncrustify.set_option( "indent_with_tabs", indentWithTabsOption.value().toString() );
+            Uncrustify.option_set_value( "indent_with_tabs", indentWithTabsOption.value().toString() );
         }
         // ----
 
         // write formated text to editor
         let crustyText = customExampleUsed ? editorSession.getValue() : option.example;
-        editorSession.setValue( Uncrustify.uncrustify( crustyText, Uncrustify.lang_flag_e.LANG_CPP ) );
+        editorSession.setValue( Uncrustify.uncrustify( crustyText, Uncrustify.Language.CPP ) );
 
         return true;
     }
@@ -1019,69 +1028,46 @@ module uncrustify_config
     {
         if( modelBuild ) { return; }
 
-        const groupEnumValues = Uncrustify.uncrustify_groups;
-        const group_map       = Uncrustify.getGroupMap();
-        const option_name_map = Uncrustify.getOptionNameMap();
-        let   groupsArr: OptionsGroup[] = [];
+        const groups = Uncrustify.get_groups ();
+        const groupsLen = groups.size ();
 
+        let groupsArr: OptionsGroup[] = [];        
 
-        let exclude_keys_set = new Set(["UO_option_count",
-                                        "UO_include_category_first",
-                                        "UO_include_category_last",
-                                        "UG_group_count",
-                                        "CT_TOKEN_COUNT_",
-                                        "FLAG_PP",
-                                        "FLAG_DIG",
-                                        "LANG_ALL",
-                                        "LANG_ALLC",
-                                        "values"]); // special
-
-        // iterate EmscriptenEnumType Object to get its keys, which are the enum
-        // value names, in this case Group enums
-        for( let enumVal in groupEnumValues )
+        for(let groupsIdx = 0; groupsIdx < groupsLen; ++groupsIdx)
         {
-            // filter group enum values
-            if( exclude_keys_set.has(enumVal) ) { continue; }
+            const group = groups.get (groupsIdx);
 
-            // groupEnumValues[ enumVal ] : Object, enum option object
-            const group_map_value = group_map.get( groupEnumValues[enumVal] );
-            if( group_map_value == null ) { continue; }
+            let group_object = new OptionsGroup(group.description);
 
-            const group_object    = new OptionsGroup( enumVal.substr(3).toLowerCase() );
-            const group_options_enum_values    = group_map_value.options;
-            const group_options_len = group_options_enum_values.size();
-            for( let i = 0; i < group_options_len; i++ )
+            const options = group.options;
+            const optionsLen = options.size ();
+            
+            for(let optionsIdx = 0; optionsIdx < optionsLen; ++optionsIdx)
             {
-                const option_enum_value = group_options_enum_values.get( i );
-                if( option_enum_value == null ) { continue; }
-
-                const option_map_value = option_name_map.get( option_enum_value );
-                if( option_map_value == null ) { continue; }
-                // filter option enum values
-                if( exclude_keys_set.has(option_map_value.name) ) { continue; }
+                const option = options.get(optionsIdx);
 
                 let option_setting: OptionPrimitiveType;
-                switch( option_map_value.type )
+                switch( option.type() as LibUncrustify.OptionTypeValue )
                 {
-                    case Uncrustify.argtype_e.AT_IARF:
-                    case Uncrustify.argtype_e.AT_POS:
-                    case Uncrustify.argtype_e.AT_LINE:
-                    case Uncrustify.argtype_e.AT_STRING:
+                    case Uncrustify.OptionType.IARF:
+                    case Uncrustify.OptionType.TOKENPOS:
+                    case Uncrustify.OptionType.LINEEND:
+                    case Uncrustify.OptionType.STRING:
                     {
-                        option_setting = Uncrustify.get_option( option_map_value.name );
+                        option_setting = option.value ();
                         break;
                     }
 
-                    case Uncrustify.argtype_e.AT_BOOL:
+                    case Uncrustify.OptionType.BOOL:
                     {
-                        option_setting = Uncrustify.get_option( option_map_value.name ) === 'true';
+                        option_setting = option.value () === 'true';
                         break;
                     }
 
-                    case Uncrustify.argtype_e.AT_NUM:
-                    case Uncrustify.argtype_e.AT_UNUM:
+                    case Uncrustify.OptionType.NUM:
+                    case Uncrustify.OptionType.UNUM:
                     {
-                        option_setting = parseInt( Uncrustify.get_option( option_map_value.name ) );
+                        option_setting = parseInt(option.value ());
                         break;
                     }
 
@@ -1091,24 +1077,30 @@ module uncrustify_config
                     }
                 }
 
-                let dependencies: string[] = dependencyMap.get( option_map_value.name );
+                let dependencies: string[] = dependencyMap.get(option.name ());
                 if( dependencies == null ) { dependencies = []; }
 
-                let example: string = optionNameString_Map.get( option_map_value.name );
-                if( example == null ) { example = exampleStringEnum_string_Map.get( ExampleStringEnum.noExampleYet); }
+                let example: string = optionNameString_Map.get(option.name ());
+                if( example == null ) 
+                { 
+                    example = exampleStringEnum_string_Map.get (
+                        ExampleStringEnum.noExampleYet
+                    ); 
+                }
 
-                const isDependentChild : boolean = childOptions_depend.has(option_map_value.name);
-                const description : string = option_map_value.name + ": "
-                                             + option_map_value.short_desc + "\n"
-                                             + option_map_value.long_desc;
+                const isDependentChild = childOptions_depend.has(option.name ());
+                const description = option.name () + ": " + option.description();
 
 
-                const option_object:Options = new Options( option_map_value.name,
-                                                           option_map_value.type,
-                                                           option_setting,
-                                                           description,
-                                                           dependencies, example,
-                                                           isDependentChild);
+                const option_object = new Options ( 
+                    option.name (),
+                    option.type (),
+                    option_setting,
+                    description,
+                    dependencies, 
+                    example,
+                    isDependentChild
+                );
 
                 group_object.addOption( option_object );
             }
@@ -1119,14 +1111,17 @@ module uncrustify_config
         ViewModel.resolveDependencies();
 
         // special case: adjusts editor tab size
-        const outputTabSizeOption: Options = ViewModel.lookupMap.get( "output_tab_size" );
+        const outputTabSizeOption = ViewModel.lookupMap.get( "output_tab_size" );
         if( outputTabSizeOption != null )
         {
-            editorSession.setTabSize( <number> outputTabSizeOption.value() );
+            editorSession.setTabSize(<number> outputTabSizeOption.value());
 
-            outputTabSizeOption.value.subscribe( function( o: number ){
-                editorSession.setTabSize( o );
-            } );
+            outputTabSizeOption.value.subscribe (
+                function (o: number) 
+                {
+                    editorSession.setTabSize( o );
+                }
+            );
         }
         modelBuild = true;
     }
@@ -1141,25 +1136,25 @@ module uncrustify_config
 
             switch( option.type )
             {
-                case Uncrustify.argtype_e.AT_IARF:
-                case Uncrustify.argtype_e.AT_POS:
-                case Uncrustify.argtype_e.AT_LINE:
-                case Uncrustify.argtype_e.AT_STRING:
+                case Uncrustify.OptionType.IARF:
+                case Uncrustify.OptionType.TOKENPOS:
+                case Uncrustify.OptionType.LINEEND:
+                case Uncrustify.OptionType.STRING:
                 {
-                    optVal = Uncrustify.get_option( option.name );
+                    optVal = Uncrustify.option_get_value( option.name );
                     break;
                 }
 
-                case Uncrustify.argtype_e.AT_BOOL:
+                case Uncrustify.OptionType.BOOL:
                 {
-                    optVal = Uncrustify.get_option( option.name ) === 'true';
+                    optVal = Uncrustify.option_get_value( option.name ) === 'true';
                     break;
                 }
 
-                case Uncrustify.argtype_e.AT_NUM:
-                case Uncrustify.argtype_e.AT_UNUM:
+                case Uncrustify.OptionType.NUM:
+                case Uncrustify.OptionType.UNUM:
                 {
-                    optVal = parseInt( Uncrustify.get_option( option.name ) );
+                    optVal = parseInt( Uncrustify.option_get_value( option.name ) );
                     break;
                 }
 
@@ -1195,7 +1190,7 @@ module uncrustify_config
         if( langEnumObj == null )
         {
             console.error( "No fitting Enum Object found for the language" + langString + " Language set to C++" );
-            langEnumObj = Uncrustify.lang_flag_e.LANG_CPP;
+            langEnumObj = Uncrustify.Language.CPP;
         }
 
         if(outputType)
