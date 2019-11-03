@@ -351,21 +351,21 @@ module uncrustify_config
     }
 
     const exampleStringEnum_string_Map = new Map<ExampleStringEnum, string>( [
-        [ ExampleStringEnum.noExample, require("raw-loader!../examples/e000.txt") ],
-        [ ExampleStringEnum.noExampleYet, require("raw-loader!../examples/e001.txt") ],
-        [ ExampleStringEnum.example1, require("raw-loader!../examples/e002.txt") ],
-        [ ExampleStringEnum.example2, require("raw-loader!../examples/e003.txt") ],
-        [ ExampleStringEnum.indentBraces, require("raw-loader!../examples/e004.txt") ],
-        [ ExampleStringEnum.multiNamespace, require("raw-loader!../examples/e005.txt") ],
-        [ ExampleStringEnum.arith, require("raw-loader!../examples/e006.txt") ],
-        [ ExampleStringEnum.paren, require("raw-loader!../examples/e007.txt") ],
-        [ ExampleStringEnum.brace, require("raw-loader!../examples/e008.txt") ],
-        [ ExampleStringEnum.func, require("raw-loader!../examples/e009.txt") ],
-        [ ExampleStringEnum.cls, require("raw-loader!../examples/e010.txt") ],
-        [ ExampleStringEnum.space_misc, require("raw-loader!../examples/e011.txt") ],
-        [ ExampleStringEnum.if_else, require("raw-loader!../examples/e012.txt") ],
-        [ ExampleStringEnum.string, require("raw-loader!../examples/e013.txt") ],
-        [ ExampleStringEnum.indentBraceParent, require("raw-loader!../examples/e014.txt") ],
+        [ ExampleStringEnum.noExample, require("!!raw-loader!../examples/e000.txt").default ],
+        [ ExampleStringEnum.noExampleYet, require("!!raw-loader!../examples/e001.txt").default ],
+        [ ExampleStringEnum.example1, require("!!raw-loader!../examples/e002.txt").default ],
+        [ ExampleStringEnum.example2, require("!!raw-loader!../examples/e003.txt").default ],
+        [ ExampleStringEnum.indentBraces, require("!!raw-loader!../examples/e004.txt").default ],
+        [ ExampleStringEnum.multiNamespace, require("!!raw-loader!../examples/e005.txt").default ],
+        [ ExampleStringEnum.arith, require("!!raw-loader!../examples/e006.txt").default ],
+        [ ExampleStringEnum.paren, require("!!raw-loader!../examples/e007.txt").default ],
+        [ ExampleStringEnum.brace, require("!!raw-loader!../examples/e008.txt").default ],
+        [ ExampleStringEnum.func, require("!!raw-loader!../examples/e009.txt").default ],
+        [ ExampleStringEnum.cls, require("!!raw-loader!../examples/e010.txt").default ],
+        [ ExampleStringEnum.space_misc, require("!!raw-loader!../examples/e011.txt").default ],
+        [ ExampleStringEnum.if_else, require("!!raw-loader!../examples/e012.txt").default ],
+        [ ExampleStringEnum.string, require("!!raw-loader!../examples/e013.txt").default ],
+        [ ExampleStringEnum.indentBraceParent, require("!!raw-loader!../examples/e014.txt").default ],
     ]);
 
     const optionNameString_Map = new Map<string, string>( [

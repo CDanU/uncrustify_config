@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "brace": "^0.11.0",
-    "raw-loader": "^0.5.1",
     "core-util-is": "^1.0.2",
     "css-loader": "^3.2.0",
     "extract-text-webpack-plugin": "^v4.0.0-alpha.0",
@@ -31,6 +30,7 @@
     "knockout": "^3.5.0",
     "node-normalize-scss": "^8.0.1",
     "node-sass": "^4.13.0",
+    "raw-loader": "^3.1.0",
     "sass-loader": "^8.0.0",
     "script-loader": "^0.7.0",
     "typings": "^2.1.0",
